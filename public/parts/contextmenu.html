@@ -1,0 +1,405 @@
+<script>
+	PLUGIN('designer').contextmenu = function(e, editor) {
+
+		var items = [];
+		var sel = editor.getSelections();
+		var text = sel.join('');
+		var can = text.length > 0;
+		var sub = [];
+		var tools = [];
+		var tmp;
+
+		if (can) {
+
+			items.push({ name: '@(Copy)', icon: '!far fa-copy', command: 'copy' });
+			items.push({ name: '@(Copy with syntax)', icon: 'print', value: 'copysyntax' });
+			items.push({ name: '@(Copy as Markdown)', icon: '!fab fa-markdown', value: 'copymarkdown' });
+
+			if (text.indexOf('<') !== -1)
+				items.push({ name: '@(Copy without tags)', icon: '!far fa-copy', value: 'copytext' });
+
+			if (text.indexOf('.define(\'') !== -1)
+				items.push({ name: '@(Copy as JSON)', icon: '!fa fa-code', value: 'copyasjson' });
+
+			items.push('-');
+
+			if (can)
+				tools.push({ name: '@(Parse keys)', icon: 'barcode', value: 'parsekeys' });
+
+			if ((/(#)?[A-F0-9]{6}/i).test(text) && text.indexOf('\n') === -1)
+				items.push({ name: '@(Convert to RGBA)', icon: 'palette', value: 'hex2rgba' });
+
+			if (((/\d+,(\s)?\d+,(\s)?\d+/i)).test(text))
+				items.push({ name: '@(Convert to HEX)', icon: 'palette', value: 'rgba2hex' });
+
+			if ((/[:\|\='"\{]/).test(text))
+				items.push({ name: '@(Align)', icon: 'align-left', value: 'align' });
+
+			if (text.indexOf('ROUTE(') !== -1)
+				items.push({ name: '@(Align routes)', icon: 'align-justify', value: 'alignrouting' });
+
+			items.push({ name: '@(Comment)', icon: 'comment-alt', value: 'comment' });
+			tmp = text.charAt(0);
+
+			if (tmp === '[' || tmp === '{')
+				items.push({ name: '@(Format JSON)', icon: 'broom', value: 'formatjson' });
+
+			if (text.indexOf('\n') !== -1)
+				items.push({ name: '@(Sort)', icon: 'sort-alpha-down', value: 'sort' });
+
+			sub = [];
+			sub.push({ name: '@(Base64)', icon: 'chevron-right', value: 'btoa' });
+			sub.push({ name: '@(Hex)', icon: 'chevron-right', value: 'hexe', server: true });
+			sub.push({ name: '@(Encode URI)', icon: 'chevron-right', value: 'encodeURIComponent' });
+			sub.push({ name: '@(Escape)', icon: 'chevron-right', value: 'escape' });
+			sub.push({ name: '@(Slug)', icon: 'chevron-right', value: 'slug' });
+			sub.push({ name: '@(HASH)', icon: 'chevron-right', value: 'HASH' });
+			sub.push({ name: '@(Translate)', icon: 'chevron-right', value: 'translate' });
+			sub.push({ name: '@(MD5)', icon: 'chevron-right', value: 'md5', server: true });
+			sub.push({ name: '@(SHA-1)', icon: 'chevron-right', value: 'sha1', server: true });
+			sub.push({ name: '@(SHA-256)', icon: 'chevron-right', value: 'sha256', server: true });
+			sub.push({ name: '@(SHA-512)', icon: 'chevron-right', value: 'sha512', server: true });
+			sub.push({ name: '@(CRC-32)', icon: 'chevron-right', value: 'crc32', server: true });
+			sub.push({ name: '@(CRC-32 unsigned)', icon: 'chevron-right', value: 'crc32unsigned', server: true });
+			sub.push({ name: '@(JSON escape)', icon: 'chevron-right', value: 'jsonescape' });
+			sub.push({ name: '@(Optimize for search)', icon: 'search', value: 'search' });
+			items.push({ name: '@(Encode)', icon: 'lock', value: 'encode', children: sub });
+
+			sub = [];
+			sub.push({ name: '@(Hex)', icon: 'chevron-right', value: 'hexd', server: true });
+			sub.push({ name: '@(Base64)', icon: 'chevron-right', value: 'atob' });
+			sub.push({ name: '@(Decode URI)', icon: 'chevron-right', value: 'decodeURIComponent' });
+			sub.push({ name: '@(Unescape)', icon: 'chevron-right', value: 'unescape' });
+			sub.push({ name: '@(JSON unescape)', icon: 'chevron-right', value: 'jsonunescape' });
+			items.push({ name: '@(Decode)', icon: 'unlock', value: 'decode', children: sub });
+
+			items.push({ name: '@(Tools)', icon: 'wrench', children: tools });
+			tools.push({ name: '@(Upper Case)', icon: 'font', value: 'upper' });
+			tools.push({ name: '@(Lower Case)', icon: 'font', value: 'lower' });
+			tools.push({ name: '@(Clean duplicated lines)', icon: 'broom', value: 'cleanduplicatedlines' });
+			items.push('-');
+		}
+
+		sub = [];
+
+		sub.push({ name: '@(UID)', icon: 'chevron-right', value: 'uid' });
+		sub.push({ name: '@(GUID)', icon: 'chevron-right', value: 'guid' });
+		sub.push({ name: '@(Password)', icon: 'chevron-right', value: 'password' });
+		sub.push({ name: '@(IP address)', icon: 'chevron-right', value: 'ip' });
+		sub.push({ name: '@(Date / Time)', icon: 'chevron-right', value: 'date' });
+
+		sub.push('-');
+		sub.push({ name: '<>="\'`', icon: 'keyboard', id: 'char' });
+		sub.push({ name: '()[]{}', icon: 'keyboard', id: 'char' });
+		sub.push({ name: ':+-*\\/|', icon: 'keyboard', id: 'char' });
+		sub.push({ name: '_&*~$', icon: 'keyboard', id: 'char' });
+		sub.push({ name: '%!@#°^', icon: 'keyboard', id: 'char' });
+
+		items.push({ name: '@(Insert)', icon: 'plus-circle green', value: 'insert', children: sub });
+		items.push({ name: '@(Insert color)', icon: 'fill-drip colorize2', value: 'colorpicker' });
+		items.push({ name: '@(Insert icon)', icon: 'image blue', value: 'icon' });
+		items.push({ name: '@(Toggle ruler)', icon: 'ruler-vertical', value: 'toggleruler' });
+
+		SETTER('menu/showxy', e.pageX + 5, e.pageY - 15, items, function(value) {
+
+			if (value.command) {
+				editor.focus();
+				setTimeout(function() {
+					document.execCommand(value.command, true);
+				}, 100);
+				return;
+			}
+
+			if (value.value === 'toggleruler') {
+				EDITOR.toggleruler();
+				return;
+			}
+
+			if (value.id === 'char') {
+				editor.replaceSelection(value.name);
+				return;
+			}
+
+			if (value.value === 'hex2rgba') {
+				editor.replaceSelection(FUNC.hex2rgba(text));
+				return;
+			}
+
+			if (value.value === 'rgba2hex') {
+				editor.replaceSelection(FUNC.rgba2hex(text));
+				return;
+			}
+
+			if (value.value === 'darkmode') {
+				editor.replaceSelection(FUNC.colorize(text, '.ui-dark'));
+				return;
+			}
+
+			if (value.value === 'responsive') {
+				editor.replaceSelection(FUNC.responsive(text));
+				return;
+			}
+
+			if (value.value === 'removedarkmode') {
+				editor.replaceSelection(FUNC.removecssclass('.ui-dark', text));
+				return;
+			}
+
+			if (value.value === 'cleanduplicatedlines') {
+				editor.replaceSelection(FUNC.cleanduplicatedlines(text));
+				return;
+			}
+
+			if (value.value === 'copyasjson') {
+				SETTER('clipboard/copy', FUNC.makejsonfromschema(text));
+				return;
+			}
+
+			if (value.value === 'copytext') {
+				SETTER('clipboard/copy', text.removeTags());
+				return;
+			}
+
+			if (value.value === 'copysyntax') {
+				var div = document.createElement('DIV');
+				var el = document.createElement('PRE');
+				div.style = 'position:absolute;left:-2000px;top:-2000px;opacity:0';
+				div.appendChild(el);
+				document.body.appendChild(div);
+				var cur = editor.getModeAt(editor.getCursor());
+				var t = cur.helperType || cur.name;
+				if (t === 'json')
+					t = 'application/ld+json';
+				CodeMirror.runMode(FUNC.strim(text).replace(/\t/g, '  '), t, el);
+				el.setAttribute('class', 'cm-s-default');
+				el.setAttribute('contenteditable', 'true');
+				el.focus();
+				document.execCommand('selectAll', false, null);
+				document.execCommand('copy', false, null);
+				setTimeout(function() {
+					document.body.removeChild(div);
+				}, 500);
+				return;
+			}
+
+			if (value.value === 'copymarkdown') {
+				var cur = editor.getModeAt(editor.getCursor());
+				var syntax = FUNC.getext(cur.helperType || cur.name);
+				SETTER('clipboard/copy', '```' + syntax + '\n' + FUNC.strim(text).replace(/\t/g, '  ').trim() + '\n```');
+				return;
+			}
+
+			if (value.value === 'formatjson') {
+				try {
+					editor.replaceSelection(JSON.stringify(JSON.parse(text), null, '\t'));
+				} catch (e) {}
+				return;
+			}
+
+			if (value.value === 'alignrouting') {
+				editor.replaceSelection(FUNC.alignrouting(text));
+				return;
+			}
+
+			if (value.value === 'sql2schema') {
+				editor.replaceSelection(FUNC.sql2schema(text));
+				return;
+			}
+
+			if (value.value === 'parsekeys') {
+				tmp = FUNC.parsekeys(text);
+				editor.replaceSelection(tmp.join(','));
+				return;
+			}
+
+			if (value.value === 'icon') {
+				var opt = {};
+				opt.x = e.pageX - 10;
+				opt.y = e.pageY - 20;
+				opt.callback = function(icon) {
+					var cur = editor.getCursor();
+					var selected = editor.getRange({ line: cur.line, ch: cur.ch - 1 }, { line: cur.line, ch: cur.ch });
+					var selection = editor.getSelection();
+					var text = selection ? selection : editor.lineInfo(cur.line).text;
+					var prev = text.substring(cur.ch - 1, cur.ch);
+					var clean = false;
+					var reg = /(fal|far|fas|fab|fa)\s/;
+					var is = { fa: 1, far: 1, fas: 1, fab: 1, fal: 1 };
+					var space = is[text.substring(cur.ch - 2, cur.ch)] || is[text.substring(cur.ch - 3, cur.ch)];
+
+					for (var i = cur.ch; i > cur.ch - 30; i--) {
+						var fa2 = text.substring(i - 4, i);
+						var fa = text.substring(i - 3, i);
+
+						if (is[fa.trim()] || is[fa2.trim()]) {
+							icon = icon.replace(reg, '');
+							break;
+						}
+					}
+					if (space || (selection && selection.indexOf(' ') === -1))
+						icon = icon.replace(reg, '');
+					editor.replaceSelection(prev && prev !== ' ' && prev !== '"' && prev !== '\'' ? (' ' + icon) : icon);
+				};
+
+				SETTER('faicons/show', opt);
+				return;
+			}
+
+			if (value.value === 'colorpicker') {
+				var opt = {};
+				opt.x = e.pageX - 10;
+				opt.y = e.pageY + 10;
+				opt.callback = function(selected) {
+					editor.replaceSelection(selected);
+				};
+				setTimeout(ASETTER('colorpicker/show', opt), 100);
+				return;
+			}
+
+			setTimeout(function() {
+
+				var items = [];
+				var y = 0;
+				var x = 20;
+
+				if (value.value === 'sort') {
+
+					for (var i = 0; i < sel.length; i++) {
+						sel[i] = sel[i].split('\n');
+						sel[i].sort();
+						sel[i] = sel[i].join('\n');
+					}
+
+					editor.replaceSelections(sel);
+					return;
+				}
+
+				if (value.value === 'upper' || value.value === 'lower') {
+					for (var i = 0; i < sel.length; i++)
+						sel[i] = value.value === 'lower' ? sel[i].toLowerCase() : sel[i].toUpperCase();
+					editor.replaceSelections(sel);
+					return;
+				}
+
+				if (value.value === 'comment') {
+
+					var cur = editor.getModeAt(editor.getCursor());
+					var syntax = FUNC.getext(cur.helperType || cur.name);
+
+					for (var i = 0; i < sel.length; i++) {
+						sel[i] = sel[i].split('\n');
+						sel[i] = FUNC.comment(syntax, sel[i]).join('\n');
+					}
+
+					editor.replaceSelections(sel);
+					return;
+				}
+
+				if (value.value === 'align') {
+					if (code.current.name === 'sitemap') {
+						for (var i = 0; i < sel.length; i++) {
+							sel[i] = sel[i].split('\n');
+							sel[i] = FUNC.alignsitemap(sel[i]).join('\n');
+						}
+						editor.replaceSelections(sel);
+					} else {
+						for (var i = 0; i < sel.length; i++) {
+							sel[i] = sel[i].split('\n');
+							sel[i] = FUNC.aligntext(sel[i]).join('\n');
+						}
+						editor.replaceSelections(sel);
+					}
+					return;
+				}
+
+				if (value.server) {
+					var model = {};
+					model.type = value.value;
+					model.body = sel;
+					DAPI('encoder', model, function(response) {
+						editor.replaceSelections(response);
+					});
+					return;
+				}
+
+				switch (value.value) {
+					case 'search':
+						for (var i = 0; i < sel.length; i++)
+							sel[i] = sel[i].toSearch();
+						editor.replaceSelections(sel);
+						break;
+					case 'uid':
+					case 'ip':
+						DAPI('{0}'.format(value.value), function(response) {
+							editor.replaceSelection(response);
+						});
+						break;
+					case 'date':
+						var dt = new Date();
+						dt.setSeconds(0);
+						dt.setMilliseconds(0);
+						editor.replaceSelection(dt.format('iso'));
+						break;
+					case 'password':
+						var pwd = GUID(15);
+						for (var i = 0; i < pwd.length; i++) {
+							if (i % 2 === 0)
+								pwd = pwd.substring(0, i) + pwd.substring(i, i + 1).toUpperCase() + pwd.substring(i + 1);
+						}
+						editor.replaceSelection(pwd);
+						break;
+					case 'GUID':
+						editor.replaceSelection(GUID(50));
+						break;
+					case 'guid':
+						editor.replaceSelection(FUNC.guid());
+						break;
+					case 'encodeURIComponent':
+					case 'decodeURIComponent':
+					case 'atob':
+					case 'btoa':
+					case 'escape':
+					case 'unescape':
+					case 'HASH':
+						for (var i = 0; i < sel.length; i++) {
+							try {
+								sel[i] = window[value.value](sel[i]).toString();
+							} catch(e) {}
+						}
+						editor.replaceSelections(sel);
+						break;
+					case 'jsonescape':
+						for (var i = 0; i < sel.length; i++) {
+							try {
+								sel[i] = JSON.stringify(sel[i]);
+							} catch(e) {}
+						}
+						editor.replaceSelections(sel);
+						break;
+					case 'jsonunescape':
+						for (var i = 0; i < sel.length; i++) {
+							try {
+								sel[i] = JSON.parse(sel[i].trim());
+							} catch(e) {}
+						}
+						editor.replaceSelections(sel);
+						break;
+					case 'translate':
+						for (var i = 0; i < sel.length; i++)
+							sel[i] = 'T' + HASH(sel[i]).toString(36);
+						editor.replaceSelections(sel);
+						break;
+					case 'slug':
+						for (var i = 0; i < sel.length; i++)
+							sel[i] = sel[i][value.value]();
+						editor.replaceSelections(sel);
+						break;
+					case 'json':
+						var tmp = PARSE(editor.getSelection().trim());
+						editor.replaceSelection(JSON.stringify(tmp));
+						break;
+				}
+			}, 200);
+		});
+	};
+</script>

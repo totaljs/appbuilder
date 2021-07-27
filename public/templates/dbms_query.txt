@@ -1,0 +1,8 @@
+var builder = DBMS().list('database');
+builder.autofill($, 'dtcreated:date,dtupdated:date', 'id', 'dtcreated_desc', 50);
+// builder.autoquery($.query, 'dtcreated:date,dtupdated:date', 'dtcreated_desc', 50);
+// builder.userid($.user.id);
+// builder.where('openplatformid', $.user.openplatformid);
+// builder.where('isremoved=FALSE');
+builder.error(404);
+builder.callback($.callback);

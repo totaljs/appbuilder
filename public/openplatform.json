@@ -1,0 +1,21 @@
+{
+	"name": "App Builder",
+	"description": "Total.js Application builder",
+	"version": "1.0.0",
+	"icon": "rocket far",
+	"url": "https://builder.totaljs.com",
+	"author": "Total Avengers",
+	"email": "info@totalavengers.com",
+	"roles": [],
+	"width": 800,
+	"height": 600,
+	"resize": true,
+	"mobilemenu": false,
+	"allownotifications": false,
+	"allowreadmeta": false,
+	"allowreadprofile": 1,
+	"allowreadusers": 0,
+	"allowreadapps": 0,
+	"serververify": false,
+	"responsive": true
+}

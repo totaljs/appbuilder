@@ -1,0 +1,142 @@
+<div data---="largeform__common.form__if:searchform;icon:far fa-file-search;title:@(Search in code);autofocus:true;reload:?/reload;scrollbar:0;submit:?/submit;width:800" class="hidden" data-scope="searchform">
+	<div class="searchform">
+		<div class="search">
+			<div data---="searchinput__?.search__placeholder:@(Search in code)"></div>
+		</div>
+		<div data---="viewbox__?.results__margin:40;scrollbar:1;parent:auto">
+			<div data-bind="?.results__template">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure>
+						<div class="name"><i class="{{ m.icon }}"></i>{{ m.name }}</div>
+						<div class="lines">
+						{{ foreach n in m.results }}
+						<div class="line exec" data-exec="?/open" data-id="{{ m.id }}" data-index="{{ $index }}">
+							<span>{{ n.line }}</span>
+							<div>{{ n.text }}</div>
+						</div>
+						{{ end }}
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</div>
+		</div>
+	</div>
+	<nav>
+		<button name="cancel" style="width:100%">@(Close)</button>
+	</nav>
+</div>
+
+<script>
+
+	PLUGIN('searchform', function(exports) {
+
+		var find = function(q, lines) {
+			var output = [];
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				var index = line.toLowerCase().indexOf(q);
+				if (index !== -1)
+					output.push({ line: i + 1, text: line.substring(index - 50, index + 50) });
+			}
+			return output.length ? output : null;
+		};
+
+		var push = function(output, item, arr, op) {
+			var obj = {};
+			var name = item.name;
+
+			if (item.type === 'route')
+				name = item.method + ' ' + item.url;
+
+			obj.id = GUID(20);
+			obj.item = item;
+			obj.operation = op;
+			obj.icon = item.icon;
+			obj.name = name + (op ? (' --> ' + op.name) : '');
+			obj.results = arr;
+			output.push(obj);
+		};
+
+		exports.search = function() {
+
+			var q = GET('?.search').toLowerCase();
+
+			if (!q) {
+				SET('?.results', []);
+				return;
+			}
+
+			var data = designer.data.body;
+			var output = [];
+
+			for (var key in data) {
+
+				var item = data[key];
+				switch (item.type) {
+					case 'route':
+					case 'definition':
+					case 'ready':
+					case 'timer':
+					case 'init':
+						break;
+					case 'schema':
+					case 'tasks':
+						break;
+					case 'config':
+					case 'resource':
+						continue;
+				}
+
+				if (item.body) {
+					var arr = find(q, item.body.split('\n'));
+					arr && push(output, item, arr);
+				}
+
+				if (item.operations) {
+					for (var i = 0; i < item.operations.length; i++) {
+						var op = item.operations[i];
+						var arr = find(q, (op.body || '').split('\n'));
+						arr && push(output, item, arr, op);
+					}
+				}
+			}
+
+			SET('?.results', output);
+		};
+
+		exports.open = function(el) {
+
+			var id = el.attrd('id');
+			var index = el.attrd('index');
+			var item = GET('?.results').findItem('id', id);
+			var data;
+
+			if (index && item.operation)
+				index = item.item.operations.indexOf(item.operation);
+			else
+				index = null;
+
+			if (index != null)
+				data = { id: item.item.id, index: index };
+			else
+				data = item.item.id;
+
+			var type = item.item.type;
+			switch (type) {
+				case 'task':
+					type = 'taskoperation';
+					break;
+				case 'schema':
+					type = 'operation';
+					break;
+			}
+
+			EXEC('designer/' + type + '_sourcecode', data);
+		};
+
+		WATCH('?.search', exports.search);
+	});
+
+</script>

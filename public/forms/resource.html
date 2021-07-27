@@ -1,0 +1,230 @@
+<style>
+	.ui-resourceeditor table { width: 100%; table-layout: fixed; }
+	.ui-resourceeditor table td, .ui-resourceeditor table th { border: 1px solid #E0E0E0; padding: 2px 5px; }
+	.ui-resourceeditor table i { float: right; margin: 4px 4px 0 0; color: red; font-size: 11px; cursor: pointer; }
+	.ui-resourceeditor-label { font-size: 11px; color: #777; padding: 0 2px; font-weight: normal; }
+	.ui-resourceeditor table input { width: 100%; border: 0; background-color: transparent; outline: 0; font-size: 11px; }
+	.ui-resourceeditor table input[name='key'] { font-weight: bold; }
+	.ui-resourceeditor table th { background-color: #F8F8F8; }
+	.ui-resourceeditor table th input { font-size: 12px; font-weight: bold; }
+	.ui-resourceeditor table td:first-child, .ui-resourceeditor table th:first-child { width: 200px; }
+
+	.ui-dark .ui-resourceeditor table td, .ui-dark .ui-resourceeditor table th { border-color: #404040; }
+	.ui-dark .ui-resourceeditor-label { color: #A0A0A0; }
+	.ui-dark .ui-resourceeditor table th { background-color: #333; }
+</style>
+
+<div data---="largeform__common.form__if:resourceform;title:@(Resource editor);icon:far fa-language;autofocus:true;scrollbar:1;submit:?/submit;width:1200" class="hidden" data-scope="resourceform">
+	<div class="padding">
+		<div class="help nmt m"><span class="link exec" data-exec="?/analyze"><i class="far fa-print-search green mr5"></i>@(Analyze localization in source-code)</span></div>
+		<div data---="resourceeditor__?.body__$id:resourceeditor__{default:''}"></div>
+		<div class="help"><span class="link exec" data-exec="?/add"><i class="far fa-plus-circle green mr5"></i>@(Add new rows)</span></div>
+	</div>
+	<nav>
+		<button name="submit"><i class="fa fa-check-circle"></i>@(APPLY)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+
+	PLUGIN('resourceform', function(exports) {
+
+		exports.add = function() {
+			SETTER('#resourceeditor/add', 10);
+		};
+
+		exports.submit = function(hide) {
+			setTimeout(function() {
+				exports.scope();
+				var model = GET('?');
+				DESIGNER.history('resourceform/submit', [CLONE(model.item)]);
+				model.item.languages = model.body;
+				UPD('designer.data.body.{0}.languages'.format(model.item.id));
+			}, 1000);
+			hide();
+		};
+
+		exports.analyze = function() {
+			var data = JSON.stringify(designer.data.body);
+			var items = data.match(/\.(error|invalid|err)\(('.*?'|".*?")/g, '');
+			var dic = {};
+			if (items) {
+				for (var i = 0; i < items.length; i++) {
+					var item = items[i];
+					var index = item.indexOf('(');
+					var w = item.substring(index + 2, item.length - 1).trim();
+					if (w.charAt(0) === '@') {
+						var tmp = w.substring(2, w.length - 1);
+						w = 'T' + HASH(tmp).toString(36);
+						dic[w] = tmp;
+					} else
+						dic[w] = '';
+				}
+			}
+
+			items = data.match(/@\(.*?\)/g, '');
+			if (items) {
+				for (var i = 0; i < items.length; i++) {
+					var item = items[i];
+					var w = item.substring(2, item.length - 1).trim();
+					var tmp = 'T' + HASH(w).toString(36);
+					dic[tmp] = w;
+				}
+			}
+
+			var lines = (GET('?.body.default') || '').split('\n');
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				var index = line.indexOf(':');
+				if (index !== -1) {
+					var key = line.substring(0, index).trim();
+					if (dic[key] != null)
+						delete dic[key];
+				}
+			}
+
+			var is = false;
+			for (var key in dic) {
+				lines.push(key + '  : ' + dic[key]);
+				is = true;
+			}
+
+			is && SET('?.body.default', lines.join('\n'));
+		};
+
+	});
+
+	COMPONENT('resourceeditor', 'maxlength:100;resources:5', function(self, config, cls) {
+
+		var cls2 = '.' + cls;
+		var container, content = null;
+		var cempty = 'empty';
+		var skip = false;
+		var empty = {};
+		var template;
+
+		self.nocompile();
+
+		self.make = function() {
+			self.aclass(cls);
+			var builder = ['<table>'];
+			builder.push('<thead><tr>');
+			template = '<tr>';
+			for (var i = 0; i < (config.resources + 1); i++) {
+				builder.push((i ? ('<th class="{0}-edit">' + (i > 1 ? '<i class="fa fa-trash-alt"></i>' : '') + '<div class="{0}-label">Language</div><div><input type="text" name="filename" placeholder="resource name" autocomplete="new-password" /></div></th>') : '<th>Key</th>').format(cls));
+				template += '<td><input autocomplete="new-password" type="text" value="{{0}}"{1} /></td>'.format(i, i == 0 ? ' name="key"' : '');
+			}
+			template += '</tr>';
+			builder.push('</tr></thead><tbody></tbody>');
+			builder.push('</table>');
+			self.html(builder.join(''));
+
+			self.event('click', 'i', function() {
+				var parent = $(this).closest('th');
+				var index = parent.index();
+				parent.find('input').val('');
+				self.element.find('tbody > tr').each(function() {
+					$(this).find('td').eq(index).find('input').val('');
+				});
+			});
+
+			self.event('change blur', 'input', function() {
+				var input = this;
+				var name = input.name;
+				if (name === 'filename')
+					input.value = input.value.slug();
+				else if (name === 'key') {
+					input.value = input.value.replace(/[\s.,%=:]/g, '').trim();
+					if (input.value.charAt(0) === '@' && input.value.charAt(1) === '(')
+						input.value = 'T' + HASH(input.value.substring(2, input.value.length - 1)).toString(36);
+				}
+
+				self.save();
+			});
+		};
+
+		self.add = function(count) {
+			var builder = [];
+			for (var j = 0; j < (count || 1); j++)
+				builder.push(template.format(''));
+			self.find('tbody').append(builder.join(''));
+		};
+
+		self.save = function() {
+			setTimeout2(self.ID + 'save', self.saveforce, 300);
+		};
+
+		self.saveforce = function() {
+
+			var keys = [];
+			var output = {};
+
+			self.find('thead > tr > th').each(function(index) {
+				if (index) {
+					var name = $(this).find('input').val().trim().slug();
+					if (name) {
+						output[name] = {};
+						keys.push(name);
+					}
+				}
+			});
+
+			self.find('tbody > tr').each(function() {
+				var arr = $(this).find('td');
+				var name = $(arr[0]).find('input').val().trim();
+				if (name) {
+					for (var i = 1; i < arr.length; i++) {
+						var key = keys[i - 1];
+						var val = $(arr[i]).find('input').val().trim();
+						if (key && name && val)
+							output[key][name] = val;
+					}
+				}
+			});
+
+			keys = Object.keys(output);
+			for (var i = 0; i < keys.length; i++)
+				output[keys[i]] = FUNC.stringifyresource(output[keys[i]]);
+
+			skip = true;
+			self.set(output);
+		};
+
+		self.setter = function(value) {
+
+			if (skip) {
+				skip = false;
+				return;
+			}
+
+			var th = self.find('th');
+			var builder = [];
+			var languages = value ? Object.keys(value) : [];
+			var dic = {};
+			var output = {};
+			var keys;
+
+			for (var i = 0; i < languages.length; i++) {
+				var lng = languages[i];
+				output[lng] = FUNC.parseresource(value[lng]);
+				keys = Object.keys(output[lng]);
+				for (var j = 0; j < keys.length; j++)
+					dic[keys[j]] = 1;
+				th.eq(i + 1).find('input').val(lng);
+			}
+
+			keys = Object.keys(dic);
+			for (var j = 0; j < keys.length + (keys.length > 50 ? 10 : (50 - keys.length)); j++) {
+				var arr = [keys[j] || ''];
+				for (var i = 0; i < languages.length; i++)
+					arr.push(output[languages[i]][keys[j]] || '');
+				builder.push(template.format.apply(template, arr));
+			}
+
+			self.find('tbody').empty().html(builder.join(''));
+		};
+
+	});
+
+</script>

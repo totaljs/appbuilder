@@ -1,0 +1,75 @@
+<div data---="miniform__common.form__if:importform;title:@(Import / Export);icon:far fa-share-alt;reload:?/reload;scrollbar:1;submit:?/submit;width:700" class="hidden" data-scope="importform">
+	<div class="padding bg-smoke">
+		<div data---="dropdowncheckbox__?.export__placeholder:@(Choose items to export);type:number;datasource:?.items">@(Export)</div>
+		<div class="help"><span class="link exec red" data-exec="?/copy"><i class="far fa-copy"></i>@(Copy to clipboard)</span></div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding">
+		<div data---="textarea__?.data__required:true;height:150" class="m">@(Data for import)</div>
+	</div>
+	<nav data---="validation__?">
+		<button name="submit" disabled><i class="far fa-file-import"></i>@(IMPORT)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+
+	PLUGIN('importform', function(exports) {
+
+		exports.reload = function(el) {
+
+			var keys = Object.keys(designer.data.body);
+			var items = [];
+
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i];
+				var item = designer.data.body[key];
+				items.push({ id: key, type: item.type, name: (item.type === 'route' ? (item.method + ' ' + item.url) : item.name), selected: true });
+			}
+
+			items.quicksort('type');
+			SET('?.items', items);
+			SET('?.export', keys);
+		};
+
+		exports.copy = function() {
+
+			var selected = GET('?.export') || [];
+			var obj = {};
+
+			for (var i = 0; i < selected.length; i++) {
+				var key = selected[i];
+				obj[key] = designer.data.body[key];
+			}
+
+			SETTER('clipboard/copy', ENCRYPT(obj, common.KEY, 'design'));
+			SETTER('snackbar/success', '@(Data has been exported to your clipboard)');
+		};
+
+		exports.submit = function(hide) {
+			var obj = DECRYPT(GET('?.data'), common.KEY, 'design');
+			if (obj) {
+				var history = [];
+				var keys = Object.keys(obj);
+				for (var i = 0; i < keys.length; i++) {
+					var id = keys[i];
+					var item = obj[id];
+					if (!designer.data.body[id]) {
+						history.push(id);
+						designer.data.body[id] = item;
+						SETTER('designer/add', item);
+					}
+				}
+				DESIGNER.history('importform/submit', history, true);
+				setTimeout(function() {
+					EXEC('designer/rebuild');
+				}, 1000);
+				SETTER('snackbar/success', '@(Objects have been imported successfully)');
+			}
+			hide();
+		};
+
+	});
+
+</script>

@@ -1,0 +1,6 @@
+var builder = DBMS().check('database');
+// builder.where('userid', '<>', $.user.id);
+// builder.where('openplatformid', $.user.openplatformid);
+builder.where('email', model.email);
+builder.error('@(Email address is already used)', true);
+builder.callback($.done());

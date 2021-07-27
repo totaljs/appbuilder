@@ -1,0 +1,2493 @@
+@{layout('')}
+@{title('Total.js AppBuilder')}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=10" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+	<meta name="robots" content="all,follow" />
+	<link rel="stylesheet" href="https://cdn.componentator.com/spa.min@18pro.css" />
+	<script src="https://cdn.componentator.com/spa.min@18.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+	@{import('meta', 'head', 'default.css + ui.css + editor.css', 'default.js + ui.js + editor.js + func.js')}
+</head>
+<body data---="exec" class="@{if query.darkmode === '1'}ui-dark @{fi}invisible">
+
+	<div data---="loading__null__style:2" class="hidden"></div>
+
+	<div data---="LAZY directory__null__placeholder:@(Search)"></div>
+	<div data---="LAZY menu__null__style:2"></div>
+	<div data---="LAZY approve"></div>
+	<div data---="LAZY message__null__style:2;closeoutside:1"></div>
+	<div data---="LAZY floatinginput"></div>
+	<div data---="LAZY faicons"></div>
+	<div data---="LAZY autocomplete"></div>
+	<div data---="LAZY colorpicker"></div>
+	<div data---="LAZY clipboard"></div>
+	<div data---="LAZY snackbar"></div>
+	<div data---="infowindows__common.windows"></div>
+	<div data---="shortcuts"></div>
+	<div data---="websocket__null__url:/?csrf=@{csrf}"></div>
+
+	<header data---="animation__null__init:500;delay:50;style:5">
+		<button title="@(Close)" class="red close exec" data-bind="common.local__hide" data-exec="designer/close"><i class="far fa-times"></i></button>
+		<div class="animation">
+			<button class="exec apply" data-exec="designer/submit"><i class="fa fa-play"></i><span>@(APPLY)</span></button>
+		</div>
+		<div class="animation">
+			<button title="@(Add)" class="exec" data-exec="designer/add"><i class="far fa-plus-circle green"></i></button>
+			<button title="@(Settings)" class="exec" data-exec="designer/settings"><b class="green hidden" data-bind="designer.data__show:value?value.minify||value.design||value.cors||value.name||value.url||value.author:false"><i class="fa fa-circle"></i></b><i class="far fa-cog"></i></button>
+			<button title="@(Variables)" class="exec" data-exec="designer/variables"><b class="green hidden" data-bind="designer.data.variables__show:value && Object.keys(value).length > 0"><i class="fa fa-circle"></i></b><i class="far fa-receipt"></i></button>
+			<button title="@(Explorer)" class="exec" data-exec="designer/explorer"><i class="far fa-clipboard-list"></i></button>
+			<button title="@(Search)" class="exec" data-exec="designer/search"><i class="far fa-file-search"></i></button>
+		</div>
+		<div class="animation">
+			<button title="@(Import / Export)" class="exec" data-exec="designer/importexport"><i class="far fa-share-alt"></i></button>
+			<button title="@(Download build with design)" class="exec" data-exec="designer/download"><i class="far fa-save"></i></button>
+			<button title="@(Clear design)" class="exec" data-exec="designer/clear"><i class="far fa-trash-alt"></i></button>
+		</div>
+		<!--<button title="@(Templates)" class="exec animation special" data-exec="designer/templates"><i class="far fa-books-medical"></i></button>-->
+		<div class="animation">
+			<a href="https://docs.totaljs.com/" title="@(Documentation: Total.js Platform)" target="_blank" class="animation special"><i class="far fa-book"></i></a>
+		</div>
+		<!--<a href="https://www.totaljs.com/support/" title="@(Support)" target="_blank" class="animation special"><i class="far fa-life-ring"></i></a>-->
+	</header>
+	<div class="header-empty"></div>
+
+	<div class="beta">@(<b>BETA</b> version)</div>
+
+	<div data-scope="designer">
+
+		<div class="toolbar">
+			<button class="exec" name="in" data-bind="?.zoom__enabled:value<100" data-exec="?/zoom" disabled><i class="far fa-search-plus"></i></button>
+			<!--<button class="exec" name="reset" data-bind="?.zoom__enabled:value!=100" data-exec="?/zoom"><i class="far fa-dot-circle"></i></button>-->
+			<button class="exec" name="out" data-bind="?.zoom__enabled:value>20" data-exec="?/zoom"><i class="far fa-search-minus"></i></button>
+			<button class="exec" name="undo" data-bind="?.history__enabled" data-exec="?/undo"><i class="fas fa-undo-alt"></i></button>
+			<button class="exec" name="code" title="@(Show hidden source-code)" data-exec="?/lastform" data-bind="common.form2id__enabled:!!value" disabled><i class="far fa-file-code"></i></button>
+		</div>
+
+		<div data---="designer__?.data.body__margin:45;contextmenu:designer/designercontextmenu;change:designer/changeposition;$assign:DESIGNER;zoom:designer.zoom;history:?.history" class="invisible">
+
+			<script type="text/html" data-type="schema">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable npb">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit nmb" title="@(Double click for editing)">{{ note | empty }}</div>
+				</div>
+				<div class="padding">
+					<div class="checkbox"><div data---="checkbox__?.data.body.{{ id }}.compress" class="mt10">@(Enable compression)</div></div>
+					<div class="checkbox"><div data---="checkbox__?.data.body.{{ id }}.encrypt">@(Enable encryption)</div></div>
+					<div class="checkbox"><div data---="checkbox__?.data.body.{{ id }}.csrf">@(Enable CSRF protection)</div></div>
+				</div>
+				<hr class="nmt nmb" />
+				<div class="add">
+					<div class="exec" data-exec="?/field_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<div class="exec mr10" data-exec="?/field_import" title="@(Import CREATE SQL)"><span><i class="far fa-file-import mr5"></i>@(Import)</span></div>
+					<div class="exec mr10" data-exec="?/field_sql" title="@(Create SQL Table)"><span><i class="far fa-database mr5"></i>@(Create SQL)</span></div>
+					<label>@(Fields)</label>
+				</div>
+				<div class="fields" data-bind="?.data.body.{{ id }}.fields__template:{#template_fields}" data---="movable__null__selector:.field;exec:?/field_move"></div>
+				<div class="add">
+					<div class="exec" data-exec="?/operation_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<label>@(Operations)</label>
+				</div>
+				<div class="operations" data-bind="?.data.body.{{ id }}.operations__template:{#template_operations}" data---="movable__null__selector:.operation;exec:?/operation_move"></div>
+				<div class="add">
+					<div class="exec" data-exec="?/schematask_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<label>@(Tasks)</label>
+				</div>
+				<div class="operations tasks" data-bind="?.data.body.{{ id }}.tasks__template:{#template_tasks}" data---="movable__null__selector:.operation;exec:?/operation_move"></div>
+				<div class="add">
+					<div class="exec" data-exec="?/route_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<label>@(Routes)</label>
+				</div>
+				<div class="routes" data-bind="?.data.body.{{ id }}.routes__template:{#template_routes}" data---="movable__null__selector:.route;exec:?/route_move"></div>
+			</script>
+
+			<script type="text/html" data-type="task">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable npb">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit nmb" title="@(Double click for editing)">{{ note | empty }}</div>
+				</div>
+				<hr style="margin:10px 0 0" />
+				<div class="add">
+					<div class="exec" data-exec="?/taskoperation_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<label>@(Operations)</label>
+				</div>
+				<div class="operations" style="margin-bottom:15px" data-bind="?.data.body.{{ id }}.operations__template:{#template_taskoperations}" data---="movable__null__selector:.operation;exec:?/operation_move"></div>
+			</script>
+
+			<script type="text/html" data-type="route">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="url url2 edit" title="@(Double click for editing)">{{ authorized | authorized }}<span class="method" data-bind="?.data.body.{{ id }}.method__exec:?/routemethodstyle">{{ method }}</span><span data-bind="?.data.body.{{ id }}.url__text">{{ url }}</span></div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/route_sourcecode"><i class="far fa-laptop-code"></i>@(Edit action)</div>
+					<div class="keys" data-bind="?.data.body.{{ id }}__html:?/routeinfo"></div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="definition">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/definition_sourcecode"><i class="far fa-laptop-code"></i>@(Script)</div>
+					<div class="keys" data-bind="?.data.body.{{ id }}.body__html:?/keywords"></div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="init">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/init_sourcecode"><i class="far fa-laptop-code"></i>@(Script)</div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="resource">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/resource_update"><i class="far fa-pencil"></i>@(Edit dictionary)</div>
+					<div class="keys" data-bind="?.data.body.{{ id }}.languages__html:?/languages"></div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="config">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/config_update"><i class="far fa-pencil"></i>@(Edit configuration)</div>
+					<div class="keys" data-bind="?.data.body.{{ id }}.body__html:?/keys"></div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="modules">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/modules_update"><i class="far fa-pencil"></i>@(Edit modules)</div>
+					<div class="keys" data-bind="?.data.body.{{ id }}__html:?/keys_modules"></div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="timer">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="minutes">
+						<b class="edit" data-type="minutes">{{ minutes }}</b> <span>min.</span>
+					</div>
+					<div class="code exec" data-exec="?/timer_sourcecode"><i class="far fa-pencil"></i>@(Script)</div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="ready">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/ready_sourcecode"><i class="far fa-pencil"></i>@(Script)</div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="middleware">
+				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
+				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
+				<div class="meta movable">
+					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
+					<div class="code exec" data-exec="?/middleware_sourcecode"><i class="far fa-pencil"></i>@(Script)</div>
+				</div>
+				<div class="padding">
+					<div class="checkbox"><div data---="checkbox__?.data.body.{{ id }}.staticfiles" class="mt10">@(Enable for static files)</div></div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="label">
+				<div class="meta movable">
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+				</div>
+			</script>
+
+			<script type="text/html" data-type="notes">
+				<div class="meta movable">
+					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
+				</div>
+			</script>
+
+		</div>
+	</div>
+
+	<script type="text/html" id="template_fields">
+		{{ foreach m in value }}
+		<div class="field subitem" data-index="{{ $index }}" draggable="true" data-type="fields">
+			<span class="remove exec" data-exec="?/field_remove"><i class="far fa-trash-o"></i></span>
+			<div class="type"><span style="background:{{ m.type | type | color }}" class="edit colorize" data-edit="?/edit" data-type="type">{{ m.type }}</span></div>
+			<div class="required exec{{ if m.required }} is{{ fi }}" data-exec="?/field_required">@(required)</div>
+			<div class="name edit" data-edit="?/edit">{{ m.name }}</div>
+		</div>
+		{{ end }}
+	</script>
+
+	<script type="text/html" id="template_operations">
+		{{ foreach m in value }}
+		<div class="operation subitem" data-index="{{ $index }}" draggable="true" data-type="operations">
+			<span class="remove exec" data-exec="?/operation_remove" title="@(Remove)"><i class="far fa-trash-o"></i></span>
+			<div class="code exec" data-exec="?/operation_sourcecode" title="@(Edit script)"><i class="far fa-laptop-code"></i>@(Script)</div>
+			<div class="roles"><i class="far fa-key"></i><span class="edit" data-type="roles">{{ m.roles | roles }}</span></div>
+			<div class="name edit">{{ m.name }}</div>
+		</div>
+		{{ end }}
+	</script>
+
+	<script type="text/html" id="template_tasks">
+		{{ foreach m in value }}
+		<div class="operation subitem" data-index="{{ $index }}" draggable="true" data-type="tasks">
+			<span class="remove exec" data-exec="?/taskoperation_remove" title="@(Remove)"><i class="far fa-trash-o"></i></span>
+			<div class="task_step edit"><span>{{ m.step | empty }}</span></div>
+			<div class="delimiter"><i class="fal fa-long-arrow-alt-right"></i></div>
+			<div class="task_name edit"><i class="far fa-traffic-light-slow"></i><span>{{ m.task | empty }}</span></div>
+			<div class="name edit">{{ m.name }}</div>
+		</div>
+		{{ end }}
+	</script>
+
+	<script type="text/html" id="template_taskoperations">
+		{{ foreach m in value }}
+		<div class="operation subitem" data-index="{{ $index }}" draggable="true" data-type="operations">
+			<span class="remove exec" data-exec="?/operation_remove" title="@(Remove)"><i class="far fa-trash-o"></i></span>
+			<div class="code exec" data-exec="?/taskoperation_sourcecode" title="@(Edit script)"><i class="far fa-laptop-code"></i>@(Script)</div>
+			<!--<div class="roles"><i class="far fa-key"></i><span class="edit" data-type="roles">{{ m.roles | roles }}</span></div>-->
+			<div class="name edit">{{ m.name }}</div>
+		</div>
+		{{ end }}
+	</script>
+
+
+	<script type="text/html" id="template_routes">
+		{{ foreach m in value }}
+		<div class="route subitem" data-index="{{ $index }}" data-type="routes" draggable="true"{{ if m.note }} title="{{ m.note }}"{{ fi }}>
+			<span class="remove exec" data-exec="?/route_remove"><i class="far fa-trash-o"></i></span>
+			<div class="actions">
+				{{ foreach n in m.actions }}
+				<span class="exec{{ if n === m.response }} selected{{ fi }}" data-exec="?/route_response" data-index="{{ $index }}">{{ n }}</span>
+				{{ end }}
+			</div>
+			<div class="url edit"><span>{{ m.authorized | authorized }}{{ m.method }}</span> {{ m.url | routing }} {{ if m.action && m.method === 'API' }}{{ m.validate | routing_validation }}{{ m.action | routing }}{{ fi }}</div>
+		</div>
+		{{ end }}
+	</script>
+
+	<script type="text/html" id="template_explorer">
+		<div class="schemawindow" data-scope="schemawindow">
+			<div class="name exec" data-exec="common/showschemachange"><i class="fas fa-angle-down"></i><span data-bind="?.name__text">---</span></div>
+			<div data---="viewbox__?__parent:.ui-infowindows-body;margin:30;scrollbar:1;visibleY:1">
+				<div data-bind="?.properties__template">
+					<template>
+						<div class="items">
+						{{ if value }}
+							{{ foreach m in value }}
+							<div class="item">
+								<div class="type"><span class="badge badge-monospace" style="background:{{ m.type | color }}">{{ m.type }}</span></div>
+								<div class="key">{{ m.path }} <em>{{ m.name }}</em></div>
+							</div>
+							{{ end }}
+						{{ fi }}
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<div data---="form__common.form2__if:customcodeform;style:1;title:@(Custom script);icon:far fa-code;submit:designer/submit_code;zindex:50;autofocus:1;width:1400" class="hidden invisible">
+		<div class="padding">
+			<div>
+				<ul class="togglebuttons">
+					<li class="exec" data-exec="designer/template">
+						<i class="far fa-laptop-code"></i>@(Insert template)
+					</li>
+					<li class="exec" data-exec="designer/autocomplete">
+						<i class="far fa-book"></i>@(Autocomplete)
+					</li>
+				</ul>
+			</div>
+			<div class="bg-smoke codehelp">
+				<div data---="viewbox__common.form2__parent:parent">
+					<div class="code"><label><i class="far fa-lightbulb-on"></i>@(Basic variables):</label><pre class="monospace" id="codehelp"></pre></div>
+				</div>
+			</div>
+			<div data---="codemirror__customcodeform.code__type:totaljs_server;parent:auto;margin:410;contextmenu:designer/contextmenu;$assign:EDITOR;height:0__''" class="mt10"></div>
+			<div class="help"><a href="https://docs.totaljs.com/total4/" target="_blank"><i class="far fa-book-spells"></i>@(Documentation)</a></div>
+		</div>
+		<nav data---="validation__customcodeform">
+			<button name="submit" disabled><i class="far fa-check-circle"></i>@(APPLY)</button>
+			<button name="cancel">@(Hide)</button>
+		</nav>
+	</div>
+
+	<div data---="form__common.form__if:importfields;width:700;title:@(Import CREATE SQL);icon:far fa-file-import;submit:designer/submit_import;zindex:50;autofocus:1" class="hidden invisible">
+		<script type="text/html">
+		<div class="padding">
+			<div data---="codemirror__importfields.code__height:300;type:plain__''" class="m"></div>
+			<div data---="checkbox__importfields.replace__null__true">@(Replace existing fields)</div>
+		</div>
+		<nav data---="validation__importfields">
+			<button name="submit" disabled><i class="far fa-file-import"></i>@(IMPORT)</button>
+			<button name="cancel">@(Cancel)</button>
+		</nav>
+		</script>
+	</div>
+
+	<div data---="importer__common.form__if:routeform;url:/forms/route.html"></div>
+	<div data---="importer__common.form__if:route2form;url:/forms/route2.html"></div>
+	<div data---="importer__common.form__if:configform;url:/forms/config.html"></div>
+	<div data---="importer__common.form__if:resourceform;url:/forms/resource.html"></div>
+	<div data---="importer__common.form__if:importform;url:/forms/import.html"></div>
+	<div data---="importer__common.form__if:settingsform;url:/forms/settings.html"></div>
+	<div data---="importer__common.form__if:intro;url:/forms/intro.html"></div>
+	<div data---="importer__common.form__if:variablesform;url:/forms/variables.html"></div>
+	<div data---="importer__common.form__if:modulesform;url:/forms/modules.html"></div>
+	<div data---="importer__common.form__if:searchform;url:/forms/search.html"></div>
+
+	<script>
+
+		var common = { version: 1, local: true, windows: [], autocomplete: true, KEY: 'appbuilder', parent: W.parent === W ? W.top : W.parent };
+		var designer = { autocomplete: [], data: { body: {} }, zoom: 100 };
+
+		CACHEPATH('common.autocomplete', '1 month', true);
+
+		common.electron = navigator.userAgent.indexOf('Electron') !== -1 && window.require != null;
+		DEF.api = '/api/';
+
+		$(document).on('drop', function(e) {
+			var file = e.originalEvent.dataTransfer.files[0];
+			if (file) {
+				var reader = new FileReader();
+				reader.onload = function() {
+					loaddesign(reader.result);
+				};
+				reader.readAsText(file);
+			}
+			e.stopPropagation();
+			e.preventDefault();
+		}).on('dragover', function(e) {
+			e.preventDefault();
+		});
+
+		ON('@flag showloading', function() {
+			SETTER('loading/show');
+		});
+
+		ON('@flag hideloading', function() {
+			SETTER('loading/hide', 1000);
+		});
+
+		$(W).on('paste', function(e) {
+			if (!common.form && !common.form2) {
+				var text = e.originalEvent.clipboardData.getData('text/plain');
+				if (text.length < 30 || (/\^[A-Z,-=+*]/).test(text))
+					return;
+				var obj = DECRYPT(text, common.KEY, 'component');
+				if (obj) {
+					var keys = Object.keys(obj);
+					var is = false;
+					for (var i = 0; i < keys.length; i++) {
+						var id = keys[i];
+
+						if (id === 'readme')
+							continue;
+
+						var item = obj[id];
+						if (!designer.data.body[id]) {
+							designer.data.body[id] = item;
+							item.x = null;
+							item.y = null;
+							SETTER('designer/add', item);
+							is = true;
+						}
+					}
+
+					if (is)
+						SETTER('snackbar/success', '@(Object has been imported successfully)');
+				} else {
+					obj = DECRYPT(text, common.KEY, 'design');
+					if (obj) {
+						var history = [];
+						var keys = Object.keys(obj);
+						for (var i = 0; i < keys.length; i++) {
+							var id = keys[i];
+							var item = obj[id];
+							if (!designer.data.body[id]) {
+								history.push(id);
+								designer.data.body[id] = item;
+								SETTER('designer/add', item);
+							}
+						}
+						DESIGNER.history('importform/submit', history, true);
+						setTimeout(function() {
+							EXEC('designer/rebuild');
+						}, 1000);
+						SETTER('snackbar/success', '@(Objects have been imported successfully)');
+					}
+				}
+			}
+		});
+
+		PLUGIN('designer', function(exports) {
+
+			var opencustomcode = function(item, val, type, section, fn, selectall) {
+
+				var name = item.name;
+
+				common.customcode = function(value) {
+
+					if (!designer.data.body[common.form2id])
+						return;
+
+					if (type === 'javascript') {
+						var tmp = 'var fn=function($){\n' + value + '\n};';
+						try {
+							new Function(tmp)();
+						} catch (err) {
+							SETTER('message/warning', err + '');
+							return false;
+						}
+					}
+
+					fn(value);
+					return true;
+				};
+
+				SET('customcodeform @reset', { code: val || '', type: type, section: section, item: item });
+				SET('common.form2', 'customcodeform');
+				SET('common.form2id', item.id);
+
+				if (common.autocomplete)
+					exports.autocomplete();
+
+				selectall && WAIT(function() {
+					return W.EDITOR && W.EDITOR.editor ? true : false;
+				}, function() {
+					setTimeout(function() {
+						EDITOR.editor.execCommand('selectAll');
+					}, 500);
+				});
+
+			};
+
+			exports.zoom = function(el) {
+				var name = el.attr('name');
+				var zoom = GET('?').zoom;
+				var tmp = zoom;
+
+				if (name === 'out') {
+					if (tmp > 20)
+						tmp -= 10;
+				} else if (name === 'reset') {
+					tmp = 100;
+				} else {
+					if (tmp < 100)
+						tmp += 10;
+				}
+
+				if (tmp !== zoom)
+					DESIGNER.zoom(tmp);
+			};
+
+			exports.lastform = function() {
+				SET('common.form2', 'customcodeform', 'restore');
+			};
+
+			exports.refresh = function() {
+
+			};
+
+			exports.clear = function() {
+				SETTER('approve/show', '@(Are you sure you want to clear designer?)', '"far fa-trash-alt" @(Clear)', function() {
+					DESIGNER.clear();
+				});
+			};
+
+			exports.search = function() {
+				SET('common.form', 'searchform');
+			};
+
+			exports.autocomplete = function() {
+
+				var p = 'autocomplete';
+				var items = [];
+
+				switch (customcodeform.section) {
+					case 'operation':
+
+						items.push({ type: 'Alias', name: 'id' });
+						items.push({ type: 'Alias', name: 'user' });
+						items.push({ type: 'Alias', name: 'query' });
+						items.push({ type: 'Alias', name: 'params' });
+						items.push({ type: 'Alias', name: 'filter' });
+						items.push({ type: 'Alias', name: 'files' });
+
+						if (customcodeform.item.fields) {
+							for (var i = 0; i < customcodeform.item.fields.length; i++)
+								items.push({ type: 'Schema', name: 'model.' + customcodeform.item.fields[i].name });
+						}
+
+						items.push({ type: 'Property', name: '$.id' });
+						items.push({ type: 'Property', name: '$.params' });
+						items.push({ type: 'Property', name: '$.query' });
+						items.push({ type: 'Property', name: '$.body' });
+						items.push({ type: 'Property', name: '$.headers' });
+						items.push({ type: 'Property', name: '$.ua' });
+						items.push({ type: 'Property', name: '$.ip' });
+						items.push({ type: 'Property', name: '$.user' });
+						items.push({ type: 'Property', name: '$.filter' });
+						items.push({ type: 'Property', name: '$.session' });
+						items.push({ type: 'Property', name: '$.req' });
+						items.push({ type: 'Property', name: '$.res' });
+						items.push({ type: 'Property', name: '$.controller' });
+						items.push({ type: 'Property', name: '$.responses' });
+						items.push({ type: 'Method', name: '$.success();' });
+						items.push({ type: 'Method', name: '$.invalid(err);' });
+						items.push({ type: 'Method', name: '$.cancel();' });
+						items.push({ type: 'Method', name: '$.callback();' });
+						break;
+
+					case 'route':
+						items.push({ type: 'Alias', name: 'id' });
+						items.push({ type: 'Alias', name: 'user' });
+						items.push({ type: 'Alias', name: 'query' });
+						items.push({ type: 'Alias', name: 'body' });
+						items.push({ type: 'Alias', name: 'params' });
+						items.push({ type: 'Alias', name: 'filter' });
+						items.push({ type: 'Alias', name: 'files' });
+						items.push({ type: 'Alias', name: 'controller' });
+						items.push({ type: 'Alias', name: 'self' });
+						items.push({ type: 'Property', name: '$.id' });
+						items.push({ type: 'Property', name: '$.params' });
+						items.push({ type: 'Property', name: '$.query' });
+						items.push({ type: 'Property', name: '$.body' });
+						items.push({ type: 'Property', name: '$.headers' });
+						items.push({ type: 'Property', name: '$.ua' });
+						items.push({ type: 'Property', name: '$.ip' });
+						items.push({ type: 'Property', name: '$.user' });
+						items.push({ type: 'Property', name: '$.session' });
+						items.push({ type: 'Property', name: '$.req' });
+						items.push({ type: 'Property', name: '$.res' });
+						items.push({ type: 'Method', name: '$.success();' });
+						items.push({ type: 'Method', name: '$.invalid(err);' });
+						items.push({ type: 'Method', name: '$.view(name);' });
+						items.push({ type: 'Method', name: '$.csrf();' });
+						items.push({ type: 'Method', name: '$.plain(content);' });
+						items.push({ type: 'Method', name: '$.file(filename);' });
+						items.push({ type: 'Method', name: '$.stream(contentType, stream);' });
+						break;
+
+					case 'definition':
+						break;
+				}
+
+				items.push({ type: 'Globals', name: 'NOW' });
+				items.push({ type: 'Globals', name: 'PATH' });
+				items.push({ type: 'Events', name: 'ON(\'event\')', code: 'ON(\'event\', function() {\n\n});' });
+				items.push({ type: 'Events', name: 'EMIT(\'event\')', code: 'EMIT(\'event\', arg1, argN);' });
+				items.push({ type: 'Globals', name: 'MAIL(\'@\')', code: 'MAIL(to, subject, view, model);' });
+				items.push({ type: 'Globals', name: 'TotalAPI(\'sms\')', code: 'TotalAPI(service, value, callback/controller/$);' });
+
+				for (var i = 0; i < designer.autocomplete.length; i++)
+					items.push({ type: designer.autocomplete[i].type, name: designer.autocomplete[i].name });
+
+				SET(p, items);
+
+				var win = common.windows.findItem('id', p);
+				if (win) {
+					SET('common.autocomplete', !!win.hidden);
+					SETTER('infowindows/toggle', p);
+				} else {
+					SET('common.autocomplete', true);
+					PUSH('common.windows', { id: p, cachekey: p, offset: { x: (WW / 100) * 70 >> 0, y: 100, width: 250, height: 300, minwidth: 200, minheight: 200 }, title: 'Autocomplete', html: '<div data-import="url:/forms/autocomplete.html"></div>', actions: { minimize: false, maximize: false, move: true, resize: true, close: true, hide: true, autosave: true }, make: function(el) { el.parent().css('z-index', 150); }});
+				}
+			};
+
+			exports.importexport = function() {
+				SET('common.form', 'importform');
+			};
+
+			exports.docs = function() {
+				FUNC.compile(designer.data, function(response) {
+					var md = FUNC.makedocs(response);
+					md = '# Wiki: __' + (designer.data.name || 'AppBuilder') + '__\n\n- URL address: <' + (designer.data.url || 'https://yourdomain.com') + '>\n- Author: __' + (designer.data.author || 'Total.js Platform') + '__\n- Updated: `' + NOW.format('yyyy-MM-dd HH:mm') + '`\n\n\n## __REST API__ endpoints\n\n' + md;
+					var data = {};
+					data.TYPE = 'builder_wiki';
+					data.body = md;
+					data = STRINGIFY(data);
+					common.parent.postMessage(data, '*');
+				});
+			};
+
+			exports.submit = function() {
+				FUNC.compile(designer.data, function(compiled) {
+					var model = {};
+					var data;
+					if (!designer.data.nodesign)
+						model.design = 'base64 ' + btoa(encodeURIComponent(JSON.stringify(designer.data)));
+					model.compiled = 'base64 ' + btoa(encodeURIComponent(compiled));
+					if (common.local) {
+						data = STRINGIFY(model);
+						var blob = new Blob([data], { type: 'text/plain; charset=utf-8' });
+						saveAs(blob, 'app.build');
+					} else {
+						model.TYPE = 'builder_save';
+						data = STRINGIFY(model);
+						common.parent.postMessage(data, '*');
+						if (!W.user)
+							SETTER('message/success', '@(Build has been applied successfully)');
+					}
+
+					common.changed = false;
+				});
+			};
+
+			exports.download = function() {
+				FUNC.compile(designer.data, function(compiled) {
+					var model = {};
+					model.design = 'base64 ' + btoa(encodeURIComponent(JSON.stringify(designer.data)));
+					model.compiled = 'base64 ' + btoa(encodeURIComponent(compiled));
+					var blob = new Blob([STRINGIFY(model)], { type: 'text/plain; charset=utf-8' });
+					saveAs(blob, 'app.build');
+				});
+			};
+
+			exports.changeposition = function() {
+				common.changed = true;
+			};
+
+			exports.designercontextmenu = function(el, e) {
+				var id = el.attrd('id');
+				var opt = {};
+				opt.x = e.pageX;
+				opt.y = e.pageY;
+				opt.items = [];
+
+				opt.items.push({ id: 'copy', name: '@(Copy to clipboard)', icon: 'far fa-copy' });
+				opt.items.push({ id: 'clone', name: '@(Duplicate)', icon: 'far fa-clone' });
+				opt.items.push({ id: 'remove', name: '@(Remove)', icon: 'far fa-trash-alt red' });
+				opt.callback = function(item) {
+					switch (item.id) {
+						case 'copy':
+							var obj = {};
+							obj[id] = designer.data.body[id];
+							SETTER('clipboard/copy', ENCRYPT(obj, common.KEY, 'component'));
+							SETTER('snackbar/success', '@(Data has been exported to your clipboard)');
+							break;
+						case 'clone':
+							var nitem = CLONE(designer.data.body[id]);
+							id = id.charAt(0) + Date.now().toString(36);
+							nitem.id = id;
+							nitem.x += 80;
+							nitem.y += 80;
+							designer.data.body[id] = nitem;
+							SETTER('designer/add', nitem);
+							exports.scope();
+							exports.rebuild();
+							common.changed = true;
+							break;
+						case 'remove':
+							exports.remove(el);
+							break;
+					}
+				};
+				SETTER('menu/show', opt);
+			};
+
+			exports.add = function(el) {
+				var opt = {};
+				opt.element = el;
+				opt.items = [];
+				opt.items.push({ id: 'schema', name: '@(Schema)', icon: 'far fa-clipboard-list-check' });
+				opt.items.push({ id: 'route', name: '@(Route)', icon: 'far fa-crosshairs' });
+				opt.items.push({ id: 'definition', name: '@(Definition)', icon: 'far fa-cogs' });
+				opt.items.push({ id: 'config', name: '@(Configuration)', icon: 'far fa-wrench' });
+				opt.items.push({ id: 'resource', name: '@(Resource)', icon: 'far fa-language' });
+				opt.items.push({ id: 'label', name: '@(Label)', icon: 'far fa-font-case' });
+				opt.items.push({ id: 'notes', name: '@(Notes)', icon: 'fal fa-file-alt' });
+				opt.items.push({ id: 'task', name: '@(Task)', icon: 'far fa-traffic-light-stop' });
+				opt.items.push({ id: 'middleware', name: '@(Middleware)', icon: 'far fa-random' });
+				opt.items.push('-');
+				opt.items.push({ id: 'ready', name: '@(Ready)', icon: 'far fa-flag-checkered' });
+				opt.items.push({ id: 'timer', name: '@(Timer)', icon: 'far fa-alarm-clock' });
+				opt.items.push('-');
+				opt.items.push({ id: 'modules', name: '@(Modules)', icon: 'far fa-alien-monster' });
+				opt.items.push({ id: 'init', name: '@(Initialization script)', icon: 'far fa-flag-checkered' });
+				opt.callback = function(item) {
+
+					switch (item.id) {
+						case 'schema':
+							var model = {};
+							model.id = 's' + Date.now().toString(36);
+							model.icon = 'far fa-code-branch';
+							model.name = 'Schema';
+							model.type = 'schema';
+							model.note = 'Description';
+							model.color = '#5599F8';
+							model.fields = [];
+							model.operations = [];
+							model.compress = true;
+							model.routes = [];
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'task':
+							var model = {};
+							model.id = 'a' + Date.now().toString(36);
+							model.icon = 'far fa-traffic-light-stop';
+							model.name = 'Task';
+							model.type = 'task';
+							model.note = 'Description';
+							model.color = '#479654';
+							model.operations = [];
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'route':
+							var model = {};
+							model.id = 'r' + Date.now().toString(36);
+							model.icon = 'far fa-crosshairs';
+							model.type = 'route';
+							model.note = 'Description';
+							model.method = 'GET';
+							model.color = '#83C83C';
+							model.url = '/';
+							model.flags = [];
+							model.length = 0;
+							model.authorized = '';
+							model.validate = '-';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'definition':
+							var model = {};
+							model.icon = 'far fa-cogs';
+							model.color = '#EF9D4B';
+							model.id = 'd' + Date.now().toString(36);
+							model.name = 'Definition';
+							model.type = 'definition';
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'label':
+							var model = {};
+							model.id = 'l' + Date.now().toString(36);
+							model.name = 'Label';
+							model.type = 'label';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'notes':
+							var model = {};
+							model.id = 'n' + Date.now().toString(36);
+							model.name = 'Notes';
+							model.type = 'notes';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'ready':
+							var model = {};
+							model.icon = 'far fa-flag-checkered';
+							model.color = '#62962B';
+							model.id = 'x' + Date.now().toString(36);
+							model.name = 'Ready';
+							model.type = 'ready';
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'timer':
+							var model = {};
+							model.icon = 'far fa-alarm-clock';
+							model.color = '#7BFA8D';
+							model.id = 't' + Date.now().toString(36);
+							model.name = 'Timer';
+							model.type = 'timer';
+							model.minutes = 1;
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'init':
+							var model = {};
+							model.icon = 'far fa-flag-checkered';
+							model.id = 'i' + Date.now().toString(36);
+							model.color = '#E73323';
+							model.name = 'Init';
+							model.type = 'init';
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'resource':
+							var model = {};
+							model.icon = 'far fa-language';
+							model.id = 'l' + Date.now().toString(36);
+							model.color = '#E73CF7';
+							model.name = 'Resource';
+							model.type = 'resource';
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'config':
+							var model = {};
+							model.color = '#62C9CA';
+							model.icon = 'far fa-wrench';
+							model.id = 'c' + Date.now().toString(36);
+							model.name = 'Configuration';
+							model.type = 'config';
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'modules':
+							var model = {};
+							model.color = '#451393';
+							model.icon = 'far fa-alien-monster';
+							model.id = 'm' + Date.now().toString(36);
+							model.name = 'Modules';
+							model.type = 'modules';
+							model.note = 'Description';
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+						case 'middleware':
+							var model = {};
+							model.id = 'w' + Date.now().toString(36);
+							model.icon = 'far fa-random';
+							model.name = 'Middleware';
+							model.type = 'middleware';
+							model.note = 'Description';
+							model.color = '#EF9D4B';
+							model.staticfiles = false;
+							designer.data.body[model.id] = model;
+							SETTER('designer/add', model);
+							break;
+					}
+					EXEC('explorerwindow/update');
+				};
+				SETTER('menu/show', opt);
+			};
+
+			exports.close = function() {
+				var close = function() {
+					common.parent.postMessage({ TYPE: 'builder_close' }, '*');
+				};
+				if (common.changed)
+					SETTER('approve/show', '@(Are you sure you want to close the builder?)', '"far fa-sign-in-alt" @(Exit)', close);
+				else
+					close();
+			};
+
+			exports.settings = function() {
+				var data = GET('?.data @clone');
+				delete data.body;
+				delete data.variables;
+				SET('settingsform', data);
+				SET('common.form', 'settingsform');
+			};
+
+			exports.variables = function() {
+				var data = GET('?.data.variables @clone');
+				SET('variablesform', { items: data });
+				SET('common.form', 'variablesform');
+			};
+
+			exports.explorer = function() {
+				var p = 'explorerwindow';
+				var win = common.windows.findItem('id', p);
+				if (win) {
+					SETTER('infowindows/toggle', p);
+				} else
+					PUSH('common.windows', { id: p, cachekey: p, offset: { x: (WW / 100) * 70 >> 0, y: 100, width: 300, height: 320, minwidth: 200, minheight: 200 }, title: '@(Explorer)', html: '<div data-import="url:/forms/explorer.html"></div>', actions: { minimize: false, maximize: false, move: true, resize: true, close: true, hide: true, autosave: true }});
+			};
+
+			exports.rebuild = function(key) {
+
+				// Loads all keywords
+				var model = designer;
+				// var keys = key ? [key] : Object.keys(model.data.body);
+				var keys = Object.keys(model.data.body);
+				var arr;
+				var resources = [];
+
+				var check = function(body, arr) {
+					var output = [];
+					for (var i = 0; i < arr.length; i++) {
+						var item = arr[i];
+						if (body.indexOf(item.keyword) !== -1) {
+							if (output.indexOf(item.key) === -1)
+								output.push(item.key);
+						}
+					}
+
+					for (var i = 0; i < resources.length; i++) {
+						var item = resources[i];
+						if (body.indexOf('invalid(' + item.keyword) !== -1 || body.indexOf('err(' + item.keyword) !== -1 || body.indexOf('error(' + item.keyword) !== -1) {
+							if (output.indexOf(item.key) === -1)
+								output.push(item.key);
+						}
+					}
+
+					return output.length ? output : null;
+				};
+
+				if (!model.autocomplete)
+					model.autocomplete = [];
+
+				var tasks = {};
+
+				for (var i = 0; i < keys.length; i++) {
+					var k = keys[i];
+					var item = model.data.body[k];
+
+					if (item.type === 'task') {
+						tasks[item.name] = item.id;
+					} else if (item.type === 'config') {
+						model.autocomplete = model.autocomplete.remove('key', k);
+						var kk = Object.keys(FUNC.parseresource(item.body));
+						arr = [];
+						for (var j = 0; j < kk.length; j++)
+							arr.push({ key: k, name: 'CONF.' + kk[j], type: 'Config' });
+						if (arr.length)
+							model.autocomplete.push.apply(model.autocomplete, arr);
+					} else if (item.type === 'resource') {
+						if (item.languages) {
+							var languages = Object.keys(item.languages);
+							for (var x = 0; x < languages.length; x++) {
+								var kk = Object.keys(FUNC.parseresource(item.languages[languages[x]]));
+								resources = [];
+								for (var j = 0; j < kk.length; j++)
+									resources.push({ key: k, keyword: '\'' + kk[j] + '\'', type: 'resource' });
+							}
+						}
+					} else if (item.type === 'definition') {
+						model.autocomplete = model.autocomplete.remove('key', k);
+						arr = FUNC.parsekeywords(item.body, true);
+						for (var j = 0; j < arr.length; j++) {
+							arr[j].key = k;
+							arr[j].type = item.type.substring(0, 1).toUpperCase() + item.type.substring(1);
+						}
+						if (arr.length)
+							model.autocomplete.push.apply(model.autocomplete, arr);
+					}
+				}
+
+				for (var i = 0; i < model.autocomplete.length; i++) {
+					var item = model.autocomplete[i];
+					var index = item.name.indexOf('(');
+					item.keyword = index === -1 ? item.name : item.name.substring(0, index);
+				}
+
+				model.connections = [];
+
+				var nameschemas = {};
+
+				for (var i = 0; i < keys.length; i++) {
+					var item = model.data.body[keys[i]];
+					if (item.type === 'schema')
+						nameschemas[item.name] = item.id;
+				}
+
+				var schemas = {};
+
+				for (var i = 0; i < keys.length; i++) {
+					var item = model.data.body[keys[i]];
+					if (item.type === 'schema') {
+
+						var name = item.name.split('/').trim();
+						schemas[item.name] = item.id;
+
+						for (var j = 0; j < item.fields.length; j++) {
+							var field = item.fields[j];
+							if (nameschemas[field.type])
+								model.connections.push(item.id + '_' + nameschemas[field.type] + '_2');
+						}
+
+						for (var j = 0; j < item.operations.length; j++) {
+							var op = item.operations[j];
+							var id = op.body ? check(op.body, model.autocomplete) : null;
+							if (id) {
+								for (var x = 0; x < id.length; x++)
+									model.connections.push(item.id + '_' + id[x] + '_1');
+							}
+						}
+
+						if (item.tasks) {
+							for (var j = 0; j < item.tasks.length; j++) {
+								var op = item.tasks[j];
+								if (tasks[op.task])
+									model.connections.push(item.id + '_' + tasks[op.task] + '_1');
+							}
+						}
+
+					} else if (item.type === 'definition' || item.type === 'route' || item.type === 'timer' || item.type === 'ready') {
+						var id = item.body ? check(item.body, model.autocomplete) : null;
+						if (id) {
+							for (var x = 0; x < id.length; x++) {
+								if (item.id !== id[x]) {
+									var link = item.id + '_' + id[x] + '_1';
+									if (model.connections.indexOf(link) === -1)
+										model.connections.push(link);
+								}
+							}
+						}
+					} else if (item.type === 'task') {
+						for (var k = 0; k < item.operations.length; k++) {
+							var op = item.operations[k];
+							var id = op.body ? check(op.body, model.autocomplete) : null;
+							if (id) {
+								for (var x = 0; x < id.length; x++) {
+									if (item.id !== id[x]) {
+										var link = item.id + '_' + id[x] + '_1';
+										if (model.connections.indexOf(link) === -1)
+											model.connections.push(link);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				keys = Object.keys(schemas);
+				for (var i = 0; i < keys.length; i++) {
+					var key = keys[i];
+					var id = schemas[key];
+					var arr = key.split('/').trim();
+					if (arr.length === 1)
+						continue;
+					model.connections.push(schemas[arr[0]] + '_' + id + '_2');
+				}
+
+				SETTER('designer/connect', model.connections);
+			};
+
+			exports.load = function(id) {
+				DAPI('projects_read/' + id, function(response) {
+					response.body = PARSE(response.body);
+					SET('?.data', response, 'update');
+					exports.rebuild();
+				});
+			};
+
+			exports.route_create = function(el) {
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var model = {};
+
+				model.url = '/api/{0}/'.format(item.name.slug().replace(/\-/g, ''));
+
+				if (common.prevroute) {
+					if (common.prevroute.method === 'API') {
+						model.url = common.prevroute.url;
+						model.method = common.prevroute.method;
+						model.authorized = common.prevroute.authorized;
+						model.length = common.prevroute.length;
+						model.validate = common.prevroute.validate;
+					} else {
+						model.method = common.prevroute.method;
+						model.authorized = common.prevroute.authorized;
+						model.length = common.prevroute.length;
+						model.validate = common.prevroute.validate;
+					}
+				}
+
+				model.item = item;
+
+				var operations = [];
+				for (var i = 0; i < item.operations.length; i++)
+					operations.push(item.operations[i]);
+
+				if (item.tasks) {
+					for (var i = 0; i < item.tasks.length; i++)
+						operations.push(item.tasks[i]);
+				}
+
+				SET('%operations', operations);
+				SET('routeform @default', model);
+				SET('common.form', 'routeform');
+			};
+
+			exports.route2_create = function(el) {
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				SET('routeform2 @default', { url: '/', item: item });
+				SET('common.form', 'route2form');
+			};
+
+			exports.operation_create = function(el) {
+
+				var parent = el.closest('.item');
+				var id = parent.attrd('id');
+				var item = designer.data.body[id];
+
+				var op = {};
+				for (var i = 0; i < item.operations.length; i++) {
+					var m = item.operations[i];
+					op[m.name] = 1;
+				}
+
+				var opt = {};
+				opt.element = el;
+				opt.items = [];
+
+				if (!op.query)
+					opt.items.push({ name: '@(Query)', id: 'query', icon: 'far fa-th-list' });
+				if (!op.read)
+					opt.items.push({ name: '@(Read)', id: 'read', icon: 'far fa-address-card' });
+				if (!op.insert)
+					opt.items.push({ name: '@(Insert)', id: 'insert', icon: 'far fa-database' });
+				if (!op.update)
+					opt.items.push({ name: '@(Update)', id: 'update', icon: 'far fa-database' });
+				if (!op.patch)
+					opt.items.push({ name: '@(Patch)', id: 'patch', icon: 'far fa-database' });
+				if (!op.save)
+					opt.items.push({ name: '@(Save)', id: 'save', icon: 'far fa-database' });
+				if (!op.remove)
+					opt.items.push({ name: '@(Remove)', id: 'remove', icon: 'far fa-trash-alt' });
+
+				if (opt.items.length)
+					opt.items.push('-');
+
+				opt.items.push({ name: 'Custom workflow', id: 'workflow', icon: 'far fa-cog' });
+
+				opt.callback = function(m) {
+					var data = {};
+					data.name = m.id;
+					PUSH('designer.data.body.{id}.operations @change'.arg(item), data);
+					setTimeout(function() {
+						SETTER('designer/reposition', item.id);
+						if (m.id === 'workflow')
+							exports.EDIT(parent.find('.operations').find('.operation:last-child').find('.name'));
+					}, 100);
+				};
+
+				SETTER('menu/show', opt);
+			};
+
+			exports.schematask_create = function(el) {
+				var parent = el.closest('.item');
+				var id = parent.attrd('id');
+				var item = designer.data.body[id];
+				var data = {};
+				data.name = 'task';
+				data.task = '';
+				data.step = '';
+				PUSH('designer.data.body.{id}.tasks @change'.arg(item), data);
+				setTimeout(function() {
+					SETTER('designer/reposition', item.id);
+					exports.EDIT(parent.find('.tasks').find('.operation:last-child').find('.name'));
+				}, 100);
+			};
+
+			exports.taskoperation_create = function(el) {
+				var parent = el.closest('.item');
+				var id = parent.attrd('id');
+				var item = designer.data.body[id];
+				var data = {};
+				data.name = 'step';
+				PUSH('designer.data.body.{id}.operations @change'.arg(item), data);
+				setTimeout(function() {
+					SETTER('designer/reposition', item.id);
+					exports.EDIT(parent.find('.operations').find('.operation:last-child').find('.name'));
+				}, 100);
+			};
+
+			exports.operation_move = function(list, dragged, target) {
+				var id = $(target).closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var operations = item.operations;
+				var arr = [];
+
+				for (var i = 0; i < list.length; i++) {
+					var el = $(list[i]);
+					arr[i] = operations[+el.attrd('index')];
+					el.attrd('index', i);
+				}
+
+				item.operations = arr;
+			};
+
+			exports.operation_remove = function(el) {
+
+				var id = (el.hclass('item') ? el : el.closest('.item')).attrd('id');
+				var index = +el.closest('.subitem').attrd('index');
+
+				SETTER('approve/show', '@(Are you sure you want to remove selected operation?)', '"far fa-trash-alt" @(Remove)', function() {
+					var name = designer.data.body[id].operations[index].name;
+					var item = designer.data.body[id];
+					var updateroutes = false;
+					item.operations.splice(index, 1);
+					UPD('designer.data.body.{0}.operations'.format(id));
+
+					if (item.routes) {
+						for (var i = 0; i < item.routes.length; i++) {
+							var route = item.routes[i];
+							index = route.actions.indexOf(name);
+							if (index !== -1) {
+								route.actions.splice(index, 1);
+								updateroutes = true;
+							}
+						}
+					} else {
+						// it can be Task/operation
+					}
+
+					if (updateroutes)
+						UPD('designer.data.body.{0}.routes'.format(id));
+
+					common.changed = true;
+					setTimeout(ASETTER('designer/reposition', id), 100);
+				});
+			};
+
+			exports.taskoperation_remove = function(el) {
+
+				var id = (el.hclass('item') ? el : el.closest('.item')).attrd('id');
+				var index = +el.closest('.subitem').attrd('index');
+
+				SETTER('approve/show', '@(Are you sure you want to remove selected operation?)', '"far fa-trash-alt" @(Remove)', function() {
+					var history = [];
+					var name = designer.data.body[id].tasks[index].name;
+					var item = designer.data.body[id];
+
+					history.push(CLONE(item));
+
+					var updateroutes = false;
+					item.tasks.splice(index, 1);
+
+					for (var i = 0; i < item.routes.length; i++) {
+						var route = item.routes[i];
+						index = route.actions.indexOf(name);
+						if (index !== -1) {
+							history.push(CLONE(route));
+							route.actions.splice(index, 1);
+							updateroutes = true;
+						}
+					}
+
+					DESIGNER.history('taskoperation_remove', history);
+					UPD('designer.data.body.{0}.tasks'.format(id));
+
+					if (updateroutes)
+						UPD('designer.data.body.{0}.routes'.format(id));
+
+					common.changed = true;
+					EXEC('designer/rebuild');
+					setTimeout(ASETTER('designer/reposition', id), 100);
+				});
+			};
+
+			exports.codehelp = function(val) {
+
+				var lines = val.split('\n');
+				for (var i = 0; i < lines.length; i++) {
+					var line = lines[i];
+					line = line.replace(/\{.*?\}/g, function(text) {
+						return '<i>' + text + '</i>';
+					}).replace(/^[a-zA-z0-9\$\.\(\)]+\s/, function(text) {
+						return '<b>' + text + '</b>';
+					}).replace(/https.*?(\s|\,|$)/, function(text) {
+						var c = text.charAt(text.length - 1);
+						var plus = c === ' ' || c === ',' ? c : '';
+						var link = c ? text.substring(0, text.length - 1) : text;
+						return '<a href="{0}" target="_blank">{0}</a>'.format(link, plus);
+					}).replace(/\-\->.*?$/g, function(text) {
+						return '<span>' + text + '</span>';
+					});
+					lines[i] = line;
+				}
+
+				$('#codehelp').html(lines.join('\n'));
+			};
+
+			exports.operation_sourcecode = function(el) {
+
+				var id = el instanceof jQuery ? el.closest('.item').attrd('id') : el.id;
+				var index = el instanceof jQuery ? +el.closest('.subitem').attrd('index') : el.index;
+				var item = designer.data.body[id];
+				var operation = item.operations[index];
+				var val = operation.body;
+				var selectall = !val;
+
+				if (!val)
+					val = '$.invalid(404);';
+
+				exports.codehelp('$ {Object}        --> Schema options, docs: https://docs.totaljs.com/total4/40d14001kg51c\nmodel {Object}    --> received data according to the schema\nid {String}       --> the first dynamic value read from the URL address\nparams {Object}   --> All dynamic arguments with values defined in the route URL address\nquery {Object}    --> Parsed query arguments from the URL address;\nuser {Object}     --> Current authorized user (nullable)');
+
+				opencustomcode(item, val, 'javascript', 'operation', function(response) {
+					if (operation) {
+						DESIGNER.history('operation_sourcecode', [CLONE(operation)]);
+						operation.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+
+			};
+
+			exports.taskoperation_sourcecode = function(el) {
+				var id = el instanceof jQuery ? el.closest('.item').attrd('id') : el.id;
+				var index = el instanceof jQuery ? +el.closest('.subitem').attrd('index') : el.index;
+				var item = designer.data.body[id];
+				var operation = item.operations[index];
+				var val = operation.body;
+				var selectall = !val;
+
+				exports.codehelp('$ {Object}        --> Task options, docs: https://docs.totaljs.com/total4/40d14001kg51c\nvalue {Object}    --> initial data\nid {String}       --> the first dynamic value read from the URL address\nparams {Object}   --> All dynamic arguments with values defined in the route URL address\nuser {Object}     --> Current authorized user (nullable)\n$.done([value]);  --> Ends task');
+
+				if (!val)
+					val = '$.next(\'NEXT_STEP_NAME\');';
+
+				opencustomcode(item, val, 'javascript', 'operation', function(response) {
+					if (operation) {
+						DESIGNER.history('taskoperation_sourcecode', [CLONE(operation)]);
+						operation.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+
+			};
+
+			exports.route_sourcecode = function(el) {
+
+				var id = el instanceof jQuery ? el.closest('.item').attrd('id') : el;
+				var item = designer.data.body[id];
+				var val = item.body;
+				var selectall = !val;
+
+				if (!val) {
+					if (item.method === 'FILE')
+						val = 'res.throw404();';
+					else if (item.method === 'SOCKET')
+						val = '$.autodestroy();\n\n$.on(\'open\', function(client) {\n\t// Your code\n});\n\n$.on(\'close\', function(client) {\n\t// Your code\n});\n\n$.on(\'message\', function(client, message) {\n\t// Your code\n});\n\n';
+					else
+						val = '$.invalid(404);';
+				}
+
+				if (item.method === 'FILE')
+					exports.codehelp('req {HttpRequest}   --> Methods https://docs.totaljs.com/total4/4047e001ik51c/\nres {HttpResponse}  --> Methods https://docs.totaljs.com/total4/4047e002ik50c/');
+				else if (item.method === 'SOCKET')
+					exports.codehelp('$ {Object}                      --> Controller, docs: https://docs4.totaljs.com/total4/3e7de001gt51c/\n$.send(message) {Function}      --> Sends data to all clients\nclient.send(message) {Function} --> Sends data to a specific client');
+				else
+					exports.codehelp('$ {Object}        --> Controller, docs: https://docs.totaljs.com/total4/3e7de001gt51c/\nparams {Object}   --> All dynamic arguments with values defined in route URL address\nquery {Object}    --> Parsed query arguments from the URL address;\nbody {Object}     --> Parsed request body\nfiles {Array}     --> Uploaded files\nuser {Object}     --> Current authorized user (nullable)');
+
+				opencustomcode(item, val, 'javascript', 'route', function(response) {
+					if (item) {
+						DESIGNER.history('route_sourcecode', [CLONE(item)]);
+						item.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+			};
+
+			exports.timer_sourcecode = function(el) {
+
+				var id = el instanceof jQuery ? el.closest('.item').attrd('id') : el;
+				var item = designer.data.body[id];
+				var val = item.body;
+				var selectall = !val;
+
+				exports.codehelp('minutes {Number}, <b>hours</b> {Number}, <b>day</b> {Number}, <b>dayname</b> {Number}\nweek {Number}, <b>month</b> {Number}, <b>year<b> {Number}\nNOW {Date}');
+
+				if (!val)
+					val = '';
+
+				opencustomcode(item, val, 'javascript', 'timer', function(response) {
+					if (item) {
+						DESIGNER.history('timer_sourcecode', [CLONE(item)]);
+						item.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+
+			};
+
+			exports.ready_sourcecode = function(el) {
+
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var val = item.body;
+				var selectall = !val;
+
+				if (!val)
+					val = '';
+
+				opencustomcode(item, val, 'javascript', 'ready', function(response) {
+					if (item) {
+						DESIGNER.history('ready_sourcecode', [CLONE(item)]);
+						item.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+
+			};
+
+			exports.middleware_sourcecode = function(el) {
+
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var val = item.body;
+				var selectall = !val;
+
+				if (!val)
+					val = 'next();';
+
+				var help = '\n// $ {Object}           --> Middleware options: https://docs.totaljs.com/total4/407ff001jy51c/#49a79001cp51c';
+				   help += '\n// req {Request}        --> Read more: https://docs.totaljs.com/total4/4047e001ik51c/';
+				   help += '\n// res {Response}       --> Read more: https://docs.totaljs.com/total4/4047e002ik50c/';
+				   help += '\n// next() {Function}    --> processes request next, then call this method';
+				   help += '\n// cancel() {Function}  --> cancels request, but "res" must answer';
+				   // help += '\n// query {Object}       --> Parsed URL query arguments';
+				   help += '\n// url {String}         --> URL address';
+
+				exports.codehelp(help);
+
+				opencustomcode(item, val, 'javascript', 'middleware', function(response) {
+					if (item) {
+						DESIGNER.history('middleware_sourcecode', [CLONE(item)]);
+						item.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+
+			};
+
+			exports.definition_sourcecode = function(el) {
+
+				var id = el instanceof jQuery ? el.closest('.item').attrd('id') : el;
+				var item = designer.data.body[id];
+				var val = item.body;
+				var selectall = !val;
+
+				exports.codehelp('FUNC {Object}              --> A temporary object for storing custom functions\nMAIN {Object}              --> A temporary object for storing custom data\nREPO {Object}              --> A temporary object for storing custom data\nTEMP {Object}              --> A temporary object for storing provisional data\nAUTH() {Function($)}       --> Authorization delegate\nLOCALIZE() {Function(req)} --> Localization delegate');
+
+				opencustomcode(item, val, 'javascript', 'definition', function(response) {
+					if (item) {
+						DESIGNER.history('definition_sourcecode', [CLONE(item)]);
+						item.body = response;
+						exports.scope();
+						exports.rebuild(id);
+						UPD('?.data.body.{0}.body'.format(id));
+						common.changed = true;
+					}
+				}, selectall);
+			};
+
+			exports.init_sourcecode = function(el) {
+
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var val = item.body;
+				var selectall = !val;
+
+				exports.codehelp('<b>IMPORTANT:</b> you need to call <b>next()</b> method.');
+
+				if (!val)
+					val = 'next();';
+
+				opencustomcode(item, val, 'javascript', 'init', function(response) {
+					if (item) {
+						DESIGNER.history('init_sourcecode', [CLONE(item)]);
+						item.body = response;
+						exports.rebuild(id);
+						common.changed = true;
+					}
+				}, selectall);
+			};
+
+			exports.route_remove = function(el) {
+				var id = el.closest('.item').attrd('id');
+				var index = +el.closest('.route').attrd('index');
+				SETTER('approve/show', '@(Are you sure you want to remove selected route?)', '"far fa-trash-alt" @(Remove)', function() {
+					var item = designer.data.body[id];
+					DESIGNER.history('route_remove', [CLONE(item)]);
+					item.routes.splice(index, 1);
+					UPD('designer.data.body.{0}.routes'.format(id));
+					common.changed = true;
+				});
+			};
+
+			exports.route_move = function(list, dragged, target) {
+				var id = $(target).closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var routes = item.routes;
+				var arr = [];
+
+				for (var i = 0; i < list.length; i++) {
+					var el = $(list[i]);
+					arr[i] = routes[+el.attrd('index')];
+					el.attrd('index', i);
+				}
+
+				DESIGNER.history('route_move', [CLONE(item)]);
+				item.routes = arr;
+				common.changed = true;
+			};
+
+			exports.route_response = function(el) {
+
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var elr = el.closest('.subitem');
+				var index = +elr.attrd('index');
+				var routes = item.routes;
+				var arr = [];
+
+				if (!el.hclass('selected'))
+					el.closest('.subitem').find('span.selected').rclass('selected');
+
+				el.tclass('selected');
+
+				DESIGNER.history('route_response', [CLONE(item)]);
+
+				if (el.hclass('selected'))
+					item.routes[index].response = el.html();
+				else
+					delete item.routes[index].response;
+
+				common.changed = true;
+			};
+
+			exports.field_create = function(el) {
+				var parent = el.closest('.item');
+				var id = parent.attrd('id');
+				var item = designer.data.body[id];
+				DESIGNER.history('field_create', [CLONE(item)]);
+				PUSH('designer.data.body.{0}.fields'.format(id), { name: 'name', type: 'string', required: false });
+				setTimeout(function() {
+					SETTER('designer/reposition', id);
+					exports.EDIT(parent.find('.fields').find('.field:last-child').find('.name'));
+					common.changed = true;
+				}, 100);
+			};
+
+			exports.field_remove = function(el) {
+				var id = el.closest('.item').attrd('id');
+				var index = +el.closest('.field').attrd('index');
+				SETTER('approve/show', '@(Are you sure you want to remove selected field?)', '"far fa-trash-alt" @(Remove)', function() {
+					var item = designer.data.body[id];
+					DESIGNER.history('field_remove', [CLONE(item)]);
+					item.fields.splice(index, 1);
+					UPD('designer.data.body.{0}.fields'.format(id));
+					setTimeout(ASETTER('designer/reposition', id), 100);
+					common.changed = true;
+				});
+			};
+
+			exports.field_required = function(el) {
+				var index = +el.closest('.field').attrd('index');
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				DESIGNER.history('field_required', [CLONE(item)]);
+				el.tclass('is');
+				item.fields[index].required = el.hclass('is');
+				common.changed = true;
+			};
+
+			exports.field_move = function(list, dragged, target) {
+				var id = $(target).closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var fields = item.fields;
+				var arr = [];
+
+				for (var i = 0; i < list.length; i++) {
+					var el = $(list[i]);
+					arr[i] = fields[+el.attrd('index')];
+					el.attrd('index', i);
+				}
+
+				DESIGNER.history('field_move', [CLONE(item)]);
+				item.fields = arr;
+				common.changed = true;
+			};
+
+			exports.submit_code = function(hide) {
+				var code = EDITOR.editor.getValue();
+				if (common.customcode && common.customcode(code)) {
+					hide && hide();
+					common.changed = true;
+				}
+			};
+
+			exports.routemethodstyle = function(value, path, el) {
+				var color = '';
+				switch (value) {
+					case 'POST':
+						color = '#2E67C5';
+						break;
+					case 'GET':
+						color = '#CCCB41';
+						break;
+					case 'PUT':
+						color = '#3B80F7';
+						break;
+					case 'PATCH':
+						color = '#5599F8';
+						break;
+					case 'DELETE':
+						color = '#B9261A';
+						break;
+					case 'API':
+						color = '#62C9CA';
+						break;
+					case 'FILE':
+						color = '#61C83B';
+						break;
+					case 'SOCKET':
+						color = '#B92EC5';
+						break;
+				}
+				el.text(value).css('background', color);
+				common.changed = true;
+			};
+
+			exports.keys = function(val, path, el) {
+				var keys = Object.keys(FUNC.parseresource(val));
+				for (var i = 0; i < keys.length; i++)
+					keys[i] = '<div><i class="far fa-key"></i>{0}</div>'.format(Thelpers.encode(keys[i]));
+				el.tclass('hidden', !keys.length);
+				return keys.join('');
+			};
+
+			var parsefilename = function(val) {
+				var index = val.lastIndexOf('/');
+				val = val.substring(index + 1).trim();
+				index = val.lastIndexOf('.');
+				if (index !== -1)
+					val = val.substring(0, index);
+				return val;
+			};
+
+			exports.keys_modules = function(val, path, el) {
+
+				if (!val)
+					return '';
+
+				var builder = [];
+
+				if (val.modules) {
+					for (var i = 0; i < val.modules.length; i++)
+						builder.push('<div><i class="fab fa-node-js"></i>{0}</div>'.format(parsefilename(val.modules[i])));
+				}
+
+				if (val.npm) {
+					for (var i = 0; i < val.npm.length; i++)
+						builder.push('<div><i class="fab fa-npm"></i>{0}</div>'.format(val.npm[i]));
+				}
+
+				el.tclass('hidden', !builder.length);
+				return builder.join('');
+			};
+
+			exports.languages = function(val, path, el) {
+				var keys = val ? Object.keys(val) : [];
+				for (var i = 0; i < keys.length; i++)
+					keys[i] = '<div><i class="far fa-language"></i>{0}</div>'.format(Thelpers.encode(keys[i]));
+				el.tclass('hidden', !keys.length);
+				return keys.join('');
+			};
+
+			exports.keywords = function(val, path, el) {
+				var items = FUNC.parsekeywords(val || '');
+				var output = [];
+				for (var i = 0; i < items.length; i++)
+					output.push('<div><i class="fas fa-caret-right"></i>{0}</div>'.format(Thelpers.encode(items[i].name)));
+
+				el.tclass('hidden', !output.length);
+				return output.join('');
+			};
+
+			exports.routeinfo = function(val, path, el) {
+
+				var output = [];
+				var template = '<div><i class="fas fa-caret-right"></i><b>{0}</b>: {1}</div>';
+
+				if (val) {
+					if (val.authorized && val.method !== 'FILE')
+						output.push(template.format('@(Restriction)', val.authorized === '+' ? '@(authorized)' : '@(unauthorized)'));
+
+					if (val.method !== 'SOCKET' && val.method !== 'FILE') {
+
+						if (val.timeout)
+							output.push(template.format('@(Timeout)', val.timeout + ' sec.'));
+
+						if ((val.method === 'POST' || val.method === 'PUT') && val.upload)
+							output.push(template.format('@(Upload)', '@(allowed)'));
+
+						if (val.method !== 'GET' && val.length)
+							output.push(template.format('@(Maximum size)', val.length + ' kB'));
+					}
+
+					if (val.method === 'SOCKET')
+						output.push(template.format('@(Serialization)', val.serialization));
+				}
+
+				el.tclass('hidden', !output.length);
+				return output.join('');
+			};
+
+			exports.template = function(el) {
+
+				var opt = {};
+				opt.element = el;
+				opt.items = [];
+				opt.placeholder = '@(Search template)';
+				opt.offsetY = 5;
+				opt.offsetX = 5;
+				opt.offsetWidth = 300;
+
+				switch (customcodeform.section) {
+					case 'operation':
+						opt.items.push({ id: 'dbms_query', name: 'DBMS: Query' });
+						opt.items.push({ id: 'dbms_read', name: 'DBMS: Read' });
+						opt.items.push({ id: 'dbms_insert', name: 'DBMS: Insert' });
+						opt.items.push({ id: 'dbms_update', name: 'DBMS: Update' });
+						opt.items.push({ id: 'dbms_remove', name: 'DBMS: Remove (soft)' });
+						opt.items.push({ id: 'dbms_remove_hard', name: 'DBMS: Remove (hard)' });
+						opt.items.push({ id: 'dbms_check', name: 'DBMS: Check email' });
+						opt.items.push({ id: 'textdb_query', name: 'TextDB: Query' });
+						opt.items.push({ id: 'textdb_read', name: 'TextDB: Read' });
+						opt.items.push({ id: 'textdb_insert', name: 'TextDB: Insert' });
+						opt.items.push({ id: 'textdb_update', name: 'TextDB: Update' });
+						opt.items.push({ id: 'textdb_remove', name: 'TextDB: Remove' });
+						opt.items.push({ id: 'textdb_check', name: 'TextDB: Check email' });
+						break;
+					case 'definition':
+						opt.items.push({ id: 'auth_token', name: 'Authorization by X-Token' });
+						opt.items.push({ id: 'dbms_auth', name: 'DBMS: Authorization' });
+						opt.items.push({ id: 'dbms_init', name: 'DBMS: Initialization connection' });
+						opt.items.push({ id: 'localization', name: 'Localization' });
+						break;
+				}
+
+				opt.callback = function(item) {
+					AJAX('GET /templates/{0}.txt'.format(item.id), function(response) {
+						EDITOR.editor.replaceSelection(response);
+					});
+				};
+
+				SETTER('directory/show', opt);
+			};
+
+			exports.remove = function(el) {
+				SETTER('approve/show', '@(Are you sure you want to remove selected item?)', '"trash-o" @(Remove)', function() {
+					var parent = el.closest('.item');
+					var id = parent.attrd('id');
+					var item = designer.data.body[id];
+					var history = [];
+					parent.remove();
+
+					history.push(CLONE(item));
+					delete designer.data.body[id];
+
+					if (item.type === 'task') {
+						for (var key in designer.data.body) {
+							var o = designer.data.body[key];
+							if (o.type === 'schema') {
+								if (o.tasks) {
+									var is = false;
+									for (var i = 0; i < o.tasks.length; i++) {
+										var t = o.tasks[i];
+										if (t.task === item.name) {
+											if (!is) {
+												history.push(CLONE(o));
+												is = true;
+											}
+											t.task = '';
+											t.step = '';
+										}
+									}
+								}
+							}
+						}
+					}
+
+					DESIGNER.history('remove', history);
+					exports.scope();
+					exports.rebuild();
+					UPD('designer.data.body');
+					common.changed = true;
+				});
+			};
+
+			exports.config_update = function(el) {
+				var index = +el.closest('.field').attrd('index');
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var model = {};
+				model.items = FUNC.parseresource(item.body || '');
+				model.item = item;
+				SET('configform @reset', model);
+				SET('common.form', 'configform');
+			};
+
+			exports.modules_update = function(el) {
+				var index = +el.closest('.field').attrd('index');
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var model = {};
+				model.modules = CLONE(item.modules);
+				model.npm = CLONE(item.npm);
+				model.item = item;
+				SET('modulesform @reset', model);
+				SET('common.form', 'modulesform');
+			};
+
+			exports.resource_update = function(el) {
+				var index = +el.closest('.field').attrd('index');
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+				var model = {};
+				model.body = CLONE(item.languages);
+				model.item = item;
+				SET('resourceform @reset', model);
+				SET('common.form', 'resourceform');
+			};
+
+			$(document).on('dblclick', '.edit', function() {
+				exports.EDIT(this);
+			});
+
+			exports.EDIT = function(element) {
+
+				var opt = {};
+				opt.element = $(element);
+
+				if (opt.element[0].tagName === 'I') {
+					var id = opt.element.closest('.item').attrd('id');
+					var item = designer.data.body[id];
+					opt.callback = function(val) {
+						DESIGNER.history('EDIT_icon', [CLONE(item)]);
+						item.icon = val;
+						opt.element.rclass2('fa').aclass(val);
+						common.changed = true;
+					};
+					SETTER('faicons/show', opt);
+					return;
+				}
+
+				if (opt.element.hclass('task_name') || opt.element.hclass('task_step')) {
+
+					var parent = opt.element.closest('.item');
+					var id = parent.attrd('id');
+					var item = designer.data.body[id];
+					var index = +opt.element.closest('.operation').attrd('index');
+					var isstep = opt.element.hclass('task_step');
+					var task = item.tasks[index];
+
+					opt.items = [];
+
+					if (isstep) {
+						if (task.task) {
+							for (var key in designer.data.body) {
+								var item = designer.data.body[key];
+								if (item.type === 'task' && item.name === task.task) {
+									for (var i = 0; i < item.operations.length; i++) {
+										var m = item.operations[i];
+										opt.items.push({ id: m.name, name: m.name, icon: 'far fa-stopwatch' });
+									}
+									break;
+								}
+							}
+						}
+					} else {
+						for (var key in designer.data.body) {
+							var item = designer.data.body[key];
+							if (item.type === 'task')
+								opt.items.push({ id: item.name, name: item.name, icon: 'far fa-traffic-light-slow' });
+						}
+					}
+
+					opt.callback = function(val) {
+						DESIGNER.history('EDIT_task', [CLONE(item)]);
+						if (isstep)
+							task.step = val.id;
+						else {
+							task.task = val.id;
+							EXEC('designer/rebuild');
+						}
+						opt.element.find('span').text(val.id);
+						common.changed = true;
+					};
+
+					SETTER('directory/show', opt);
+					return;
+				}
+
+				if (opt.element.hclass('color')) {
+					var parent = opt.element.closest('.item');
+					var id = parent.attrd('id');
+					var item = designer.data.body[id];
+					opt.callback = function(val) {
+						DESIGNER.history('EDIT_color', [CLONE(item)]);
+						item.color = val;
+						opt.element.css('background', val);
+						parent.css('border-color', val);
+						parent.find('> .icon').css('border-color', val);
+						common.changed = true;
+					};
+					SETTER('colorpicker/show', opt);
+					return;
+				}
+
+				if (opt.element.hclass('url2')) {
+					// route 2
+					var id = opt.element.closest('.item').attrd('id');
+					var item = designer.data.body[id];
+					SET('route2form', CLONE(item));
+					SET('common.form', 'route2form');
+					return;
+				}
+
+				if (opt.element.hclass('url')) {
+					// route
+					var id = opt.element.closest('.item').attrd('id');
+					var item = designer.data.body[id];
+					var index = +opt.element.closest('.subitem').attrd('index');
+					var route = item.routes[index];
+					var model = CLONE(route);
+					model.item = item;
+					model.index = index;
+
+					var operations = [];
+					for (var i = 0; i < item.operations.length; i++)
+						operations.push(item.operations[i]);
+
+					if (item.tasks) {
+						for (var i = 0; i < item.tasks.length; i++)
+							operations.push(item.tasks[i]);
+					}
+
+					SET('%operations', operations);
+					SET('routeform', model);
+					SET('common.form', 'routeform');
+					return;
+				}
+
+				var ismeta = opt.element.parent().hclass('meta');
+				var subtype = opt.element.attrd('type') || 'name';
+
+				opt.value = opt.element.html();
+
+				if (opt.value === '---')
+					opt.value = '';
+
+				opt.maxlength = 10000;
+				opt.monospace = true;
+				opt.select = true;
+
+				switch (subtype) {
+					case 'type':
+						opt.icon = 'far fa-database';
+						opt.offsetWidth = 250;
+						opt.summary = '<b>@(Allowed types:)</b><div class="floatinginput-types"><span>string</span><span>number</span><span>date</span><span>boolean</span><span>email</span><span>phone</span><span>zip</span><span>uppercase</span><span>lowercase</span><span>name</span><span>url</span><span>capitalize</span><span>uid</span><span>json</span><span>base64</span></div>Some types can contain defined max. length e.g. <code>String(50)</code> and types can be defined as array in the form e.g. <code>[email]</code>.';
+						opt.placeholder = 'string(50)';
+						break;
+
+					case 'minutes':
+						opt.icon = 'far fa-alarm-clock';
+						opt.summary = '@(Enter minutes when the framework will execute the script.)';
+						opt.placeholder = 'Minutes';
+						break;
+
+					case 'roles':
+
+						if (opt.value.charAt(0) === '<')
+							opt.value = '';
+
+						opt.icon = 'far fa-key';
+						opt.offsetWidth = 270;
+						opt.summary = '@(Type <b>user roles</b> that will be permitted to this operation. A comma must separate roles.)';
+						opt.placeholder = 'admin, editor';
+						break;
+
+					default:
+						opt.summary = '@(We recommend keeping the name in lowercase and without special characters)';
+						break;
+				}
+
+				opt.callback = function(val) {
+
+					var id = opt.element.closest('.item').attrd('id');
+					var item = designer.data.body[id];
+					var old;
+					var history = [];
+
+					common.changed = true;
+					val = val.trim();
+
+					history.push(CLONE(item));
+					DESIGNER.history('EDIT', history);
+
+					if (val) {
+
+						if (subtype === 'type')
+							val = val.replace(/\s|,|\.|\-/g, '');
+
+						if (ismeta) {
+							if (opt.element.hclass('description'))
+								item.note = val;
+							else {
+
+								old = item.name;
+
+								if (item.type === 'schema' || item.type === 'task')
+									val = val.replace(/\s|\.|,/g, '');
+
+								item.name = val;
+
+								if (item.type === 'task') {
+									for (var key in designer.data.body) {
+										var o = designer.data.body[key];
+										if (o.type === 'schema' && o.tasks) {
+											for (var i = 0; i < o.tasks.length; i++) {
+												var t = o.tasks[i];
+												if (t.task === old) {
+													t.task = val;
+													UPD('designer.data.body.{0}.tasks'.format(key));
+												}
+											}
+										}
+									}
+								}
+
+								if (item.type === 'schema' || item.type === 'task')
+									exports.rebuild();
+							}
+
+							opt.element.html(val);
+							return;
+						}
+
+						if (subtype === 'minutes') {
+							item.minutes = val.parseInt();
+							if (item.minutes <= 0)
+								item.minutes = 1;
+							opt.element.html(item.minutes + '');
+							return;
+						}
+
+						var subitem = opt.element.closest('.subitem');
+						var aindex = subitem.attrd('index');
+						var index = aindex ? +aindex : -1;
+						var type = subitem.attrd('type');
+						var oldsubtype = subtype ? item[type][index][subtype] : null;
+
+						old = item[type][index].name;
+						item[type][index][subtype] = val;
+
+						if (subtype === 'type' && opt.element.hclass('colorize'))
+							opt.element.css('background', Thelpers.color(Thelpers.type(val)));
+
+						opt.element.html(val);
+
+						if (type === 'operations' && subtype !== 'roles' && item.type !== 'task') {
+							var updateroutes = false;
+							for (var i = 0; i < item.routes.length; i++) {
+								var route = item.routes[i];
+								var index = route.actions.indexOf(old);
+								if (index !== -1) {
+									if (route.response === route.actions[index])
+										route.response = val;
+									route.actions[index] = val;
+									updateroutes = true;
+								}
+							}
+							updateroutes && UPD('designer.data.body.{0}.routes'.format(id));
+						}
+					} else if (subtype === 'roles') {
+						var subitem = opt.element.closest('.subitem');
+						var index = +subitem.attrd('index');
+						var type = subitem.attrd('type');
+						delete item[type][index][subtype];
+						opt.element.html(Thelpers.roles());
+					}
+
+					if (item.type === 'task') {
+						for (var key in designer.data.body) {
+							var o = designer.data.body[key];
+							var is = false;
+							if (o.type === 'schema') {
+								if (o.tasks) {
+									var is = false;
+									for (var i = 0; i < o.tasks.length; i++) {
+										var t = o.tasks[i];
+										if (t.step === oldsubtype) {
+											if (!is) {
+												history.push(CLONE(o));
+												is = true;
+											}
+											t.step = val;
+											UPD('designer.data.body.{0}.tasks'.format(key));
+										}
+									}
+								}
+
+							}
+						}
+					}
+
+				};
+
+				SETTER('floatinginput/show', opt);
+			};
+
+			exports.undo = function() {
+				DESIGNER.undo();
+				setTimeout(function() {
+					exports.scope();
+					exports.rebuild();
+				}, 10);
+			};
+
+			exports.field_sql = function(el) {
+				var id = el.closest('.item').attrd('id');
+				var data = designer.data.body[id];
+				var builder = [];
+
+				builder.push('"id" varchar(25)');
+
+				for (var i = 0; i < data.fields.length; i++) {
+
+					var field = data.fields[i];
+					var type = field.type;
+					var size = 0;
+
+					var index = type.indexOf('(');
+					if (index !== -1) {
+						size = +type.substring(index + 1, type.length - 1);
+						type = type.substring(0, index);
+					}
+
+					switch (type.toLowerCase()) {
+						case 'string':
+						case 'uppercase':
+						case 'lowercase':
+						case 'upper':
+						case 'lower':
+						case 'capitalize':
+						case 'capitalize2':
+						case 'name':
+							type = size ? ('varchar(' + size + ')') : 'text';
+							break;
+						case 'number':
+						case 'number2':
+							type = 'numeric';
+							break;
+						case 'date':
+							type = 'timestamp';
+							break;
+						case 'boolean':
+							type = 'boolean DEFAULT false';
+							break;
+						case 'uid':
+							type = 'varchar(25)';
+							break;
+						case 'email':
+							type = 'varchar(120)';
+							break;
+						case 'phone':
+							type = 'varchar(20)';
+							break;
+						case 'zip':
+							type = 'varchar(10)';
+							break;
+						case 'url':
+							type = 'varchar(500)';
+							break;
+						case 'json':
+						case 'object':
+							type = 'json';
+							break;
+						default:
+							break;
+					}
+
+					if (type)
+						builder.push('\t"' + field.name + '" ' + type);
+				}
+
+				builder.push('\t"isremoved" boolean DEFAULT false');
+				builder.push('\t"dtupdated" timestamp');
+				builder.push('\t"dtcreated" timestamp');
+				builder.push('\tPRIMARY KEY ("id")');
+				SETTER('clipboard/copy', 'CREATE TABLE "{0}" (\n\t{1}\n)'.format('tbl_' + data.name.toLowerCase(), builder.join(',\n')));
+				SETTER('snackbar/success', '@(SQL statement has been copied to your clipboard successfully)');
+			};
+
+			exports.field_import = function(el) {
+				SET('importfields @reset', { code: '', replace: true, el: el });
+				SET('common.form', 'importfields');
+			};
+
+			exports.submit_import = function(hide) {
+
+				var parent = importfields.el.closest('.item');
+				var id = parent.attrd('id');
+				var fields = FUNC.parsefields(importfields.code);
+				var item = designer.data.body[id];
+				var p = 'designer.data.body.{0}.fields'.format(id);
+				var arr = [];
+
+				for (var i = 0; i < fields.length; i++) {
+					var f = fields[i];
+					arr.push({ name: f.path, type: f.type });
+				}
+
+				DESIGNER.history('submit_import', [CLONE(item)]);
+
+				if (importfields.replace)
+					SET(p, arr);
+				else
+					PUSH(p, arr);
+
+				setTimeout(function() {
+					SETTER('designer/reposition', id);
+				}, 100);
+
+				hide();
+			};
+
+		});
+
+		var loaddesign = function(build) {
+
+			if (typeof(build) === 'string')
+				build = PARSE(build);
+
+			if (!build)
+				build = {};
+			else if (typeof(build.design) === 'string') {
+				if ((/^base64\s/i).test(build.design))
+					build.design = decodeURIComponent(atob(build.design.substring(7).trim()));
+				else
+					build.design = PARSE(build.design);
+			}
+
+			W.user = build.user;
+
+			if (!build)
+				build = { design: {} };
+			else if (!build.design)
+				build.design = {};
+
+			if (typeof(build.design) === 'string')
+				build.design = PARSE(build.design);
+
+			if (!build.design.body)
+				build.design.body = {};
+
+			if (build.uid && build.user)
+				SETTER('websocket/send', { TYPE: 'open', uid: build.uid });
+
+			clearTimeout2('intro');
+			SET('designer.data', build.design, 'update');
+			EXEC('designer/rebuild');
+		};
+
+		var loadmessage = function(e) {
+			var msg = e.originalEvent.data;
+			if (msg) {
+				$(W).off('message', loadmessage);
+				var build = PARSE(msg);
+				if (build && (build.TYPE === 'builder_ready' || build.openplatform))
+					SET('common.local', true);
+				else {
+					SET('common.local', false);
+					loaddesign(build);
+				}
+			}
+		};
+
+		$(W).on('message', loadmessage);
+		$('body').rclass('invisible', 500);
+
+		PLUGINABLE('fieldform', function(exports) {
+
+			exports.create = function(el) {
+
+				var id = el.closest('.item').attrd('id');
+				var item = designer.data.body[id];
+
+				var opt = {};
+				opt.element = el;
+				opt.align = 'right';
+				opt.offsetY = 5;
+				opt.offsetX = 10;
+				SET('? @default', { item: item });
+				SETTER(true, '#fieldform/show', opt);
+			};
+
+			exports.submit = function(hide) {
+				var model = GET('? @reset');
+				DESIGNER.history('fieldform/submit', [CLONE(model.item)]);
+				var data = CLONE(model);
+				data.version = common.version;
+				delete data.item;
+				PUSH('designer.data.body.{id}.fields'.arg(model.item), data);
+				hide();
+				common.changed = true;
+			};
+
+		}, function(next) {
+
+			IMPORT('/forms/field.html', next);
+
+		});
+
+		ON('ready', function() {
+
+			if (common.parent !== W)
+				common.parent.postMessage(STRINGIFY({ TYPE: 'builder_ready' }), '*');
+
+			NAV.query.url && AJAX(QUERIFY('GET /api/download/ @showloading', NAV.query), function(response) {
+				if (response && response.design)
+					loaddesign(response);
+				SETTER('loading/hide');
+			});
+		});
+
+		setTimeout2('intro', function() {
+			if (!BLOCKED('intro', '1 day'))
+				SET('common.form', 'intro');
+		}, 2000);
+
+		Thelpers.emptyicon = function(val) {
+			return val || 'far fa-icons';
+		};
+
+		Thelpers.emptycolor = function(val) {
+			return val || 'inherit';
+		};
+
+		Thelpers.roles = function(val) {
+			return val && val.length > 0 ? val : '<em>@(everyone)</em>';
+		};
+
+		Thelpers.authorized = function(val) {
+			return val === '+' ? '<i class="far fa-lock-alt mr5 red"></i>' : val === '-' ? '<i class="far fa-lock-open mr5"></i>' : '';
+		};
+
+		Thelpers.routing = function(val) {
+			return Thelpers.encode(val).replace(/\{.*?\}/g, function(val) {
+				return '<em class="param">{0}</em>'.format(Thelpers.encode(val));
+			});
+		};
+
+		Thelpers.routing_validation = function(val) {
+			return '<em class="validation validation-{1}">{0}</em>'.format(val, val === '+' ? 'full' : val === '#' ? 'partial' : 'none');
+		};
+
+		// Copy
+		SETTER(true, 'shortcuts/register', 'cmd + c, ctrl + c', function() {
+			if (!common.form && !common.form2) {
+				var selected = DESIGNER.find('.item.selected');
+				if (selected.length) {
+					var id = selected.attrd('id');
+					if (id) {
+						var obj = {};
+						obj[id] = designer.data.body[id];
+						SETTER('clipboard/copy', ENCRYPT(obj, common.KEY, 'component'));
+						SETTER('snackbar/success', '@(Data has been exported to your clipboard)');
+					}
+				}
+			}
+		});
+
+		// Duplicate
+		SETTER(true, 'shortcuts/register', 'cmd + d, ctrl + d', function() {
+			if (!common.form && !common.form2) {
+				var selected = DESIGNER.find('.item.selected');
+				if (selected.length) {
+					var id = selected.attrd('id');
+					if (id) {
+						var item = CLONE(designer.data.body[id]);
+						id = id.charAt(0) + Date.now().toString(36);
+						item.id = id;
+						item.x += 80;
+						item.y += 80;
+						designer.data.body[id] = item;
+						SETTER('designer/add', item);
+						EXEC('designer/rebuild');
+						common.changed = true;
+					}
+				}
+			}
+		}, true);
+
+		SETTER(true, 'shortcuts/register', 'cmd + s, ctrl + s', function() {
+			if (common.form2 === 'customcodeform') {
+				EXEC('designer/submit_code');
+				RESET('customcodeform');
+				common.changed = false;
+				setTimeout(AEXEC('designer/submit'), 500);
+			} else
+				EXEC('designer/submit');
+		}, true);
+
+		SETTER(true, 'shortcuts/register', 'F10', function() {
+			if (common.parent !== W)
+				common.parent.postMessage(STRINGIFY({ TYPE: 'builder_shortcut', key: 'F10' }), '*');
+		}, true);
+
+		SETTER(true, 'shortcuts/register', 'F1', function() {
+			EXEC('designer/explorer');
+		}, true);
+
+		SETTER(true, 'shortcuts/register', 'cmd + f, ctrl + f', function() {
+			EXEC('designer/search');
+		}, true);
+
+	</script>
+
+	<div data-import="url:/parts/contextmenu.html"></div>
+	<script src="https://cdn.componentator.com/visitors.min@1.js" async defer></script>
+
+</body>
+</html>

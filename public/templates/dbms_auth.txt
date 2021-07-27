@@ -1,0 +1,71 @@
+var opt = {};
+
+// A secret key
+opt.secret = CONF.auth_secret || 'YOUR_SECRET_KEY';
+
+// A cookie name (optional)
+opt.cookie = CONF.auth_cookie || 'YOUR_COOKIE_NAME';
+
+// Header name for obtaining of token (if you do not want to use cookie (or can be used with the cookie)
+// opt.header = 'X-Token';
+
+// Memory expiration
+// opt.expire = '5 minutes';
+
+// A simple DDOS protection (max. limit per IP)
+// opt.ddos = 10;
+
+// A cookie options
+// opt.options = { samesite: 'lax' }
+
+opt.onread = function(meta, next) {
+
+	// meta.sessionid {String}
+	// meta.userid {String}
+	// meta.ua {String} A user-agent
+	// next(USER_DATA) {Function} A callback function
+
+	DBMS().read('view_user_session').where('sessionid', meta.sessionid).where('userid', meta.userid).where('ua', meta.ua).callback(next);
+};
+
+// Release delegate
+opt.onfree = function(meta) {
+
+	// meta.expired {Array String} with sessionid
+	// meta.users {Array String} with userid (can be "null")
+
+	var mod = { isonline: false };
+	var db = DBMS();
+	db.modify('tbl_user_session', mod).query('isonline=TRUE').id(meta.expired);
+	meta.users && db.modify('tbl_user', mod).query('isonline=TRUE').id(meta.users);
+};
+
+// Applies preddefined session + extends "opt" object
+AUTH(opt);
+
+// Stores "session" instance to a global variable
+MAIN.session = opt;
+
+var db = DBMS();
+db.query('UPDATE tbl_user_session SET isonline=FALSE WHERE isonline=TRUE');
+db.query('UPDATE tbl_user SET isonline=FALSE WHERE isonline=TRUE');
+
+// Logout:
+// MAIN.session.logout($);
+// returns Boolean;
+
+// Releases all users in the memory
+// MAIN.session.refresh(userid);
+
+// Creates a token for cookie or custom header and returns {String} with token
+// MAIN.session.sign(sessionid, userid);
+
+// Creates a secured cookie
+// $ can be controller or Schema/Task/Operation options
+// MAIN.session.authcookie($, sessionid, userid, expiration, [options]);
+
+// Contains all sessions
+// MAIN.session.sessions {Object}
+
+// Contains all blocked IP addresses
+// MAIN.session.blocked {Object}

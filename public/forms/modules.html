@@ -1,0 +1,80 @@
+<div data---="miniform__common.form__if:modulesform;title:@(Modules);icon:far fa-alien-monster;autofocus:true;scrollbar:1;submit:?/submit;width:600" class="hidden" data-scope="modulesform">
+	<div class="padding bg-smoke">
+		<div class="keyvalue-monospace">
+			<div data---="textboxlist__?.modules__placeholder:@(Type URL address and press enter);autocomplete:?/autocomplete;maxlength:5000">@(Total.js modules)</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="keyvalue-monospace">
+			<div data---="textboxlist__?.npm__placeholder:@(Type NPM name and press enter);maxlength:5000">@(NPM modules)</div>
+		</div>
+	</div>
+	<nav data---="validation__?">
+		<button name="submit" disabled><i class="fa fa-check-circle"></i>@(APPLY)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+
+	PLUGIN('modulesform', function(exports) {
+
+		var autocomplete = [];
+
+		DAPI('autocomplete_modules', function(response) {
+			autocomplete = response;
+		});
+
+		var focused;
+
+		exports.insert = function(el) {
+			var opt = {};
+			opt.element = el;
+			opt.items = [];
+			opt.items.push({ name: '@(PostgreSQL)', icon: 'far fa-database', value: 'postgresql://user:password@localhost:5432/database' });
+			opt.items.push({ name: '@(SMTP options)', icon: 'far fa-envelope', children: [{ name: 'Unsecured', value: '{"secure":false,"port":25,"user":"","password":"","timeout":10000}' }, { name: 'Gmail', value: '{ "port": 465, "secure": true, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "rejectUnauthorized": true }' }, { name: 'Office 365', value: '{ "port": 587, "secure": false, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "tls": { "ciphers": "SSLv3" }}' }] });
+			opt.items.push({ id: 'random', name: '@(Random value)', icon: 'far fa-calculator' });
+			opt.align = 'right';
+			opt.callback = function(item) {
+				var value = '';
+				if (item.value)
+					value = item.value;
+				else if (item.id === 'random')
+					value = GUID(40);
+				focused && (focused.value = value);
+			};
+			SETTER('menu/show', opt);
+		};
+
+		exports.autocomplete = function(el) {
+			var opt = {};
+			opt.element = el;
+			opt.offsetWidth = 300;
+			opt.offsetY = 17;
+			opt.search = function(query, render) {
+				var arr = [];
+				for (var i = 0; i < autocomplete.length; i++) {
+					var item = autocomplete[i];
+					if (item.name.indexOf(query) !== -1)
+						arr.push(item);
+				}
+				render(arr);
+			};
+			opt.callback = function(value, input) {
+				input.val(value.name);
+			};
+			SETTER('autocomplete/show', opt);
+		};
+
+		exports.submit = function(hide) {
+			var model = GET('? @reset');
+			DESIGNER.history('modulesform/submit', [CLONE(model.item)]);
+			model.item.modules = model.modules || [];
+			model.item.npm = model.npm || [];
+			UPD('designer.data.body.' + model.item.id + '.body');
+			hide();
+		};
+
+	});
+
+</script>

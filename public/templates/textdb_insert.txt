@@ -1,0 +1,8 @@
+model.id = UID();
+model.dtcreated = NOW;
+// model.userid = $.user.id;
+// model.openplatformid = $.user.openplatformid;
+// model.ua = $.ua;
+// model.ip = $.ip;
+
+NOSQL('database').insert(model).callback($.done(model.id));

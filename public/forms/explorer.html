@@ -1,0 +1,107 @@
+<div class="explorerwindow" data-scope="explorerwindow">
+	<div data---="searchinput__%explorerwindowsearch__placeholder:@(Search)"></div>
+	<div data---="viewbox__null__parent:auto;margin:0;scrollbar:1;visibleY:1;margin:30" class="invisible">
+		<div data-bind="?__template" data---="search__%explorerwindowsearch__selector:.item;datasource:?">
+			<script type="text/html">
+				<div class="items">
+				{{ if value }}
+					{{ foreach m in value }}
+					<div class="item exec" data-search="{{ m.name }}" data-exec="?/search" data-index="{{ $index }}">
+						<div class="type" style="background:{{ m.type | color }}">{{ m.type }}</div>
+						<span>{{ m.name }}</span>
+					</div>
+					{{ end }}
+				{{ fi }}
+				</div>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+	PLUGIN('explorerwindow', function(exports) {
+
+		exports.search = function(el) {
+			var item = GET('?')[+el.attrd('index')];
+			var elitem = DESIGNER.element.find('.item[data-id="{0}"]'.format(item.id));
+			var offset = { left: elitem.css('left').parseInt(), top: elitem.css('top').parseInt() };
+			DESIGNER.scrollbar.area.animate({ scrollLeft: offset.left - (((WW / 2) - (elitem.width() / 2)) >> 0), scrollTop: offset.top - (((WH / 2) - (elitem.height() / 2)) >> 0) }, 800, function() {
+				elitem.aclass('focus').rclass('focus', 1000);
+			});
+		};
+
+		exports.update = function() {
+
+			var response = designer.data.body;
+			var keys = Object.keys(response);
+			var arr = [];
+
+			for (var i = 0; i < keys.length; i++) {
+
+				var key = keys[i];
+				var item = response[key];
+				var sort = 0;
+				var name;
+
+				switch (item.type) {
+					case 'schema':
+						sort = 11;
+						name = item.name;
+						break;
+					case 'route':
+						sort = 9;
+						name = item.method + ' ' + item.url;
+						break;
+					case 'definition':
+						sort = 8;
+						name = item.name;
+						break;
+					case 'timer':
+						sort = 7;
+						name = item.name;
+						break;
+					case 'resource':
+						sort = 6;
+						name = item.name;
+						break;
+					case 'config':
+						sort = 5;
+						name = item.name;
+						break;
+					case 'task':
+						sort = 9;
+						name = item.name;
+						break;
+					case 'modules':
+						sort = 3;
+						name = item.name;
+						break;
+					case 'init':
+						sort = 4;
+						name = item.name;
+						break;
+				}
+
+				if (sort) {
+					arr.push({ id: key, name: name, type: item.type, sort: sort });
+
+					if (item.type === 'schema' && item.routes && item.routes.length) {
+						for (var j = 0; j < item.routes.length; j++) {
+							var route = item.routes[j];
+							name = route.method + ' ' + route.url + (route.method === 'API' ? route.action : '');
+							arr.push({ id: key, name: item.name + ' - ' + name, type: item.type, sort: 10 });
+						}
+					}
+				}
+
+			}
+
+			arr.quicksort('sort_desc,name_asc');
+			SET('?', arr);
+
+		};
+
+		WATCH('designer.data.body', exports.update, true);
+
+	});
+</script>

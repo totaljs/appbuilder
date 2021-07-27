@@ -1,0 +1,56 @@
+<div data---="miniform__common.form__if:settingsform;icon:far fa-cog;title:@(Settings);autofocus:1;reload:?/reload;scrollbar:1;submit:?/submit;width:500" class="hidden" data-scope="settingsform">
+
+	<div class="padding bg-smoke">
+
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data---="input__?.name__maxlength:80">@(Build name)</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data---="input__?.version__maxlength:10;align:1" class="b">@(Version)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data---="input__?.url__maxlength:100;icon:far fa-globe__'https://'">@(URL address)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data---="input__?.author__maxlength:100;icon:far fa-user-cowboy">@(Author)</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div data---="checkbox__?.cors">@(Enable CORS)</div>
+		<div data---="checkbox__?.minify">@(Minify and obfuscate compiled code)</div>
+		<div data---="checkbox__?.nodesign">@(Do not store design architecture)</div>
+		<div class="alert mt10 hidden small" data-bind="?.minify__show"><i class="far fa-exclamation-triangle"></i><b>@(Warning)</b>:<br />@(Total.js framework can't determine errors more clearly in minified code.)</div>
+	</div>
+
+	<nav data---="validation__?">
+		<button name="submit" disabled><i class="fa fa-check-circle"></i>@(APPLY)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+
+	PLUGIN('settingsform', function(exports) {
+
+		exports.reload = function(com) {
+		};
+
+		exports.submit = function(hide) {
+
+			var model = GET('?');
+			var keys = Object.keys(model);
+
+			for (var i = 0; i < keys.length; i++)
+				designer.data[keys[i]] = model[keys[i]];
+
+			UPD('designer.data');
+			hide();
+		};
+
+	});
+
+</script>

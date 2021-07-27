@@ -1,0 +1,68 @@
+<div data---="largeform__common.form__if:route2form;icon:far fa-globe;width:800;title:@(Route settings);submit:?/submit;autofocus:1" class="hidden invisible" data-scope="route2form">
+	<div class="padding bg-smoke">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.method__dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE,FILE|FILE,SOCKET|SOCKET;required:1__'GET'">@(Method)</div>
+				<div data-bind="?.method__show:value==='PUT'||value==='POST'" class="hidden mt10">
+					<div data---="checkbox__?.upload__null__true">@(Enable upload)</div>
+				</div>
+			</div>
+			<div class="col-md-9 m">
+				<div data---="input__?.url__required:1;monospace:1__'/'">@(Endpoint)</div>
+				<div class="help" data-bind="?.method__show:value!=='FILE'">@(Supports dynamic arguments:) <code>{id}</code></div>
+			</div>
+		</div>
+	</div>
+	<hr class="nmt" />
+	<div class="padding npt">
+
+		<div data-bind="?.method__show:value!=='FILE'">
+
+			<div data---="radiobuttonexpert__?.authorized__datasource:+|Authorized|far fa-key,-|Unauthorized|far fa-lock-alt,|Everyone|far fa-door-open__''" class="m">
+				<script type="text/html">
+					<div class="rauth">
+						<i class="{{ icon }}"></i>
+						<div>{{ name }}</div>
+					</div>
+				</script>
+			</div>
+
+			<hr />
+			<div class="row">
+				<div class="col-md-3 m">
+					<div data---="input__?.timeout__type:number__5" data-bind="?.method__enabled:value!=='SOCKET'">@(Timeout)</div>
+					<div class="help">@(In seconds)</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.length__type:number__3" data-bind="?.method__enabled:value!=='GET'&&value!=='FILE'&&value!=='SOCKET'">@(Request body limit)</div>
+					<div class="help">@(In kilobytes)</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.serialization__dirsource:json|JSON,text|Text,buffer|Buffer__'json'" data-bind="?.method__enabled:value==='SOCKET'">@(Data serialization)</div>
+					<div class="help">@(WebSocket only)</div>
+				</div>
+			</div>
+			<hr class="nmt" />
+			<div data---="checkbox__?.csrf">@(Enable CSRF protection)</div>
+		</div>
+	</div>
+	<nav data---="validation__?">
+		<button name="submit" disabled><i class="far fa-check-circle"></i>@(APPLY)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+	PLUGIN('route2form', function(exports) {
+
+		exports.submit = function(hide) {
+			var model = GET('? @reset');
+			DESIGNER.history('route2form/submit', [CLONE(designer.data.body[model.id])]);
+			designer.data.body[model.id] = model;
+			UPD('designer.data.body.{id} @change'.arg(model));
+			hide();
+		};
+
+	});
+
+</script>

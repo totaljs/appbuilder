@@ -1,0 +1,11 @@
+var builder = NOSQL('database').one2();
+// builder.where('userid', '<>', $.user.id);
+// builder.where('openplatformid', $.user.openplatformid);
+builder.field('id');
+builder.where('email', model.email);
+builder.callback(function(err, response) {
+	if (response)
+		$.invalid('@(Email address is already used)');
+	else
+		$.success();
+});

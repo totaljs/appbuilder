@@ -1,0 +1,7 @@
+AUTH(function($) {
+	var token = $.header['x-token'];
+	if (token === 'YOURTOKEN')
+		$.success({ name: '3rd party app name' });
+	else
+		$.invalid();
+});

@@ -1,0 +1,42 @@
+<div class="autocomplete" data-scope="autocomplete">
+	<div data---="searchinput__%autocompletesearch__placeholder:@(Search)"></div>
+	<div data---="viewbox__null__parent:auto;margin:0;scrollbar:1;visibleY:1;margin:30" class="invisible">
+		<div data-bind="?__template" data---="search__%autocompletesearch__selector:.item">
+			<script type="text/html">
+				<div class="items">
+				{{ if value }}
+					{{ foreach m in value }}
+					<div class="item exec" data-search="{{ m.name }}" data-exec="?/insert" data-index="{{ $index }}">
+						<div class="type" style="background:{{ m.type | color }}">{{ m.type }}</div>
+						<span>{{ m.name | raw }}</span>
+					</div>
+					{{ end }}
+				{{ fi }}
+				</div>
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+	PLUGIN('autocomplete', function(exports) {
+
+		exports.insert = function(el) {
+			var item = GET('?')[+el.attrd('index')];
+			if (item)
+				EDITOR.editor.replaceSelection(item.code || item.name);
+		};
+
+		WATCH('common.form2', function(path, value) {
+			if (value !== 'customcodeform') {
+
+				var win = common.windows.findItem('id', 'autocomplete');
+				if (win.hidden)
+					SET('common.autocomplete', false);
+				else
+					SETTER('infowindows/hide', 'autocomplete');
+			}
+		});
+
+	});
+</script>

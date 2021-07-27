@@ -1,0 +1,94 @@
+<div data---="largeform__common.form__if:configform;title:@(Update configuration);icon:far fa-wrench;autofocus:true;scrollbar:1;submit:?/submit;width:800" class="hidden" data-scope="configform">
+	<div class="padding">
+		<div class="alert m">
+			<i class="far fa-exclamation-triangle"></i>@(We recommend keeping all custom keys in lower-case. If you want to extend the existing <b>Total.js configuration</b>, then follow the configuration) <a href="https://docs.totaljs.com/total4/4047c001sd51c/" class="b" target="_blank">@(documentation)</a>.
+		</div>
+		<div class="keyvalue-monospace">
+			<div data---="keyvalue__?.items__placeholderkey:@(Type a key);placeholdervalue:@(Type a value and press enter);autocomplete:?/autocomplete;$id:configformkeyvalue;maxlength:5000">@(Configuration keys)</div>
+		</div>
+		<div class="help"><span class="link exec pull-right" data-exec="?/insert"><i class="far fa-book-spells mr5"></i>@(Insert value)</span><i class="far fa-keyboard"></i>@(Type a key with value and press enter)</div>
+	</div>
+	<nav data---="validation__?">
+		<button name="submit" disabled><i class="fa fa-check-circle"></i>@(APPLY)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+
+	PLUGIN('configform', function(exports) {
+
+		var focused;
+		var autocomplete;
+
+		DAPI('autocomplete_config', function(response) {
+			autocomplete = response;
+		});
+
+		FIND('#configformkeyvalue', function(com) {
+			com.event('focus', 'input', function() {
+				focused = this;
+			});
+		});
+
+		exports.insert = function(el) {
+			var opt = {};
+			opt.element = el;
+			opt.items = [];
+			opt.items.push({ name: '@(PostgreSQL)', icon: 'far fa-database', value: 'postgresql://user:password@localhost:5432/database' });
+			opt.items.push({ name: '@(SMTP options)', icon: 'far fa-envelope', children: [{ name: 'Unsecured', value: '{"secure":false,"port":25,"user":"","password":"","timeout":10000}' }, { name: 'Gmail', value: '{ "port": 465, "secure": true, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "rejectUnauthorized": true }' }, { name: 'Office 365', value: '{ "port": 587, "secure": false, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "tls": { "ciphers": "SSLv3" }}' }] });
+			opt.items.push({ id: 'random', name: '@(Random value)', icon: 'far fa-calculator' });
+			opt.align = 'right';
+			opt.callback = function(item) {
+
+				var value = '';
+				if (item.value)
+					value = item.value;
+				else if (item.id === 'random')
+					value = GUID(40);
+
+				focused && (focused.value = value);
+			};
+			SETTER('menu/show', opt);
+		};
+
+		exports.autocomplete = function(el) {
+			var opt = {};
+			opt.element = el;
+			opt.offsetWidth = 300;
+			opt.offsetY = 16;
+			opt.offsetX = -1;
+			opt.search = function(query, render) {
+				var arr = [];
+				for (var i = 0; i < autocomplete.length; i++) {
+					var item = autocomplete[i];
+					if (item.name.indexOf(query) !== -1)
+						arr.push(item);
+				}
+				render(arr);
+			};
+			opt.callback = function(value, input) {
+				input.val(value.name);
+			};
+			SETTER('autocomplete/show', opt);
+		};
+
+		exports.submit = function(hide) {
+
+			var model = GET('? @reset');
+			var keys = Object.keys(model.items);
+			var builder = [];
+
+			for (var i = 0; i < keys.length; i++)
+				builder.push(keys[i] + '   : ' + model.items[keys[i]]);
+
+			DESIGNER.history('configform/submit', [CLONE(model.item)]);
+			model.item.body = builder.join('\n');
+			UPD('designer.data.body.' + model.item.id + '.body');
+			EXEC('designer/rebuild');
+			hide();
+		};
+
+	});
+
+</script>

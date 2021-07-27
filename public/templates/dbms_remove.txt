@@ -1,0 +1,11 @@
+var model = {};
+model.dtupdated = NOW;
+model.isremoved = true;
+
+var builder = DBMS().modify('database', model);
+// builder.userid($.user.id);
+// builder.where('openplatformid', $.user.openplatformid);
+builder.id($.id);
+// builder.log($);
+builder.error(404);
+builder.callback($.done($.id));

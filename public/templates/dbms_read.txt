@@ -1,0 +1,8 @@
+var builder = DBMS().read('database');
+// builder.fields('id,name,dtcreated');
+// builder.userid($.user.id);
+// builder.where('openplatformid', $.user.openplatformid);
+// builder.where('isremoved=FALSE');
+builder.id($.id);
+builder.error(404);
+builder.callback($.callback);

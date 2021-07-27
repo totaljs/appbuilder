@@ -1,0 +1,121 @@
+<div data---="largeform__common.form__if:routeform;icon:far fa-globe;width:800;title:@(Route settings);submit:?/submit;autofocus:1" class="hidden invisible" data-scope="routeform">
+	<div class="padding bg-smoke npb">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.method__dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE,API|API;required:1__'GET'">@(Method)</div>
+			</div>
+			<div class="col-md-9 m">
+				<div data-bind="?.method__show:value!=='API'" class="hidden">
+					<div data---="input__?.url__required:1;monospace:1__'/'">@(Endpoint)</div>
+					<div class="help">@(Supports dynamic arguments:) <code>{id}</code></div>
+				</div>
+				<div data-bind="?.method__show:value==='API'" class="hidden">
+					<div class="row">
+						<div class="col-xs-6">
+							<div data---="input__?.url__required:1;monospace:1__'/'">@(Endpoint)</div>
+							<div class="help">@(Supports dynamic arguments:) <code>{id}</code></div>
+						</div>
+						<div class="col-xs-6">
+							<div data---="input__?.action__required:1;monospace:1__''"><b>@(Action)</b></div>
+							<div class="help">@(Supports dynamic arguments:) <code>{id}</code></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div data-bind="?.method__show:value==='API'" class="hidden">
+		<hr class="nmt" />
+		<div class="padding npt ui-input-required">
+			<div class="ui-input-label">@(Data validation):</div>
+			<div data---="radiobuttonexpert__?.validate__datasource:+|@(Entire schema)|far fa-star,#|@(Received data)|far fa-star-half-alt,-|@(Disabled)|far fa-thumbs-up__'-'" class="m">
+				<script type="text/html">
+					<div class="rauth">
+						<i class="{{ icon }}"></i>
+						<div>{{ name }}</div>
+					</div>
+				</script>
+			</div>
+		</div>
+	</div>
+
+	<hr class="nmt" />
+	<div class="padding npt">
+		<div class="ui-input-required">
+			<div class="ui-input-label">@(Choose operations in order:)</div>
+		</div>
+		<div data---="selectbox__?.actions__datasource:%operations;search:@(Search);height:200;value:name;required:1" class="m mt5"></div>
+		<div class="help">@(Operations are executed in order)</div>
+	</div>
+	<hr class="nmt" />
+	<div class="padding">
+
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.timeout__type:number__5" data-bind="?.method">@(Timeout)</div>
+				<div class="help">@(In seconds)</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.length__type:number__3" data-bind="?.method__enabled:value!=='GET'">@(Request body limit)</div>
+				<div class="help">@(In kilobytes)</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data---="radiobuttonexpert__?.authorized__datasource:+|Authorized|far fa-key,-|Unauthorized|far fa-lock-open,|Everyone|far fa-door-open__''">
+					<script type="text/html">
+						<div class="rauth">
+							<i class="{{ icon }}"></i>
+							<div>{{ name }}</div>
+						</div>
+					</script>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div data---="input__?.note__maxlength:100" class="m">@(Note)</div>
+	</div>
+	<nav data---="validation__?">
+		<button name="submit" disabled><i class="far fa-check-circle"></i>@(APPLY)</button>
+		<button name="cancel">@(Cancel)</button>
+	</nav>
+</div>
+
+<script>
+	PLUGIN('routeform', function(exports) {
+
+		exports.submit = function(hide) {
+			var model = GET('? @reset');
+
+			DESIGNER.history('routeform/submit', [CLONE(model.item)]);
+
+			var data = CLONE(model);
+			var item = data.item;
+			var path = 'designer.data.body.{id}.routes'.arg(item);
+
+			delete data.item;
+			delete data.index;
+
+			if (!data.actions)
+				data.actions = [];
+
+			if (data.actions.length === 1)
+				data.response = data.actions[0];
+			else if (model.index == null)
+				data.response = data.actions[data.actions.length - 1];
+
+			common.prevroute = data;
+
+			if (model.index == null) {
+				PUSH(path + ' @change', data);
+			} else {
+				GET(path)[model.index] = data;
+				UPD(path + ' @change');
+			}
+
+			setTimeout(ASETTER('designer/reposition', item.id), 100);
+			hide();
+		};
+
+	});
+
+</script>

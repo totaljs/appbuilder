@@ -1,0 +1,10 @@
+model.id = UID();
+model.dtcreated = NOW;
+// model.userid = $.user.id;
+// model.openplatformid = $.user.openplatformid;
+// model.ua = $.ua;
+// model.ip = $.ip;
+
+var builder = DBMS().insert('database', model);
+// builder.log($, model);
+builder.callback($.done(model.id));

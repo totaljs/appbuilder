@@ -1,0 +1,6 @@
+var builder = NOSQL('database').list();
+builder.autofill($, 'dtcreated:date,dtupdated:date', 'id', 'dtcreated_desc', 50);
+// builder.userid($.user.id);
+// builder.where('openplatformid', $.user.openplatformid);
+builder.error(404);
+builder.callback($.callback);
