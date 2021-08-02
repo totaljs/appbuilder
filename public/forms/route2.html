@@ -1,4 +1,4 @@
-<div data---="largeform__common.form__if:route2form;icon:far fa-globe;width:800;title:@(Route settings);submit:?/submit;autofocus:1" class="hidden invisible" data-scope="route2form">
+<div data---="largeform__common.form__if:route2form;icon:fa fa-globe;width:800;title:@(Route settings);submit:?/submit;autofocus:1" class="hidden invisible" data-scope="route2form">
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-3 m">
@@ -18,7 +18,7 @@
 
 		<div data-bind="?.method__show:value!=='FILE'">
 
-			<div data---="radiobuttonexpert__?.authorized__datasource:+|Authorized|far fa-key,-|Unauthorized|far fa-lock-alt,|Everyone|far fa-door-open__''" class="m">
+			<div data---="radiobuttonexpert__?.authorized__datasource:+|Authorized|fa fa-key,-|Unauthorized|fa fa-lock,|Everyone|fa fa-door-open__''" class="m">
 				<script type="text/html">
 					<div class="rauth">
 						<i class="{{ icon }}"></i>
@@ -47,7 +47,7 @@
 		</div>
 	</div>
 	<nav data---="validation__?">
-		<button name="submit" disabled><i class="far fa-check-circle"></i>@(APPLY)</button>
+		<button name="submit" disabled><i class="fa fa-check-circle"></i>@(APPLY)</button>
 		<button name="cancel">@(Cancel)</button>
 	</nav>
 </div>

@@ -1,4 +1,4 @@
-<div data---="miniform__common.form__if:modulesform;title:@(Modules);icon:far fa-alien-monster;autofocus:true;scrollbar:1;submit:?/submit;width:600" class="hidden" data-scope="modulesform">
+<div data---="miniform__common.form__if:modulesform;title:@(Modules);icon:fa fa-plug;autofocus:true;scrollbar:1;submit:?/submit;width:600" class="hidden" data-scope="modulesform">
 	<div class="padding bg-smoke">
 		<div class="keyvalue-monospace">
 			<div data---="textboxlist__?.modules__placeholder:@(Type URL address and press enter);autocomplete:?/autocomplete;maxlength:5000">@(Total.js modules)</div>
@@ -31,9 +31,9 @@
 			var opt = {};
 			opt.element = el;
 			opt.items = [];
-			opt.items.push({ name: '@(PostgreSQL)', icon: 'far fa-database', value: 'postgresql://user:password@localhost:5432/database' });
-			opt.items.push({ name: '@(SMTP options)', icon: 'far fa-envelope', children: [{ name: 'Unsecured', value: '{"secure":false,"port":25,"user":"","password":"","timeout":10000}' }, { name: 'Gmail', value: '{ "port": 465, "secure": true, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "rejectUnauthorized": true }' }, { name: 'Office 365', value: '{ "port": 587, "secure": false, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "tls": { "ciphers": "SSLv3" }}' }] });
-			opt.items.push({ id: 'random', name: '@(Random value)', icon: 'far fa-calculator' });
+			opt.items.push({ name: '@(PostgreSQL)', icon: 'fa fa-database', value: 'postgresql://user:password@localhost:5432/database' });
+			opt.items.push({ name: '@(SMTP options)', icon: 'fa fa-envelope', children: [{ name: 'Unsecured', value: '{"secure":false,"port":25,"user":"","password":"","timeout":10000}' }, { name: 'Gmail', value: '{ "port": 465, "secure": true, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "rejectUnauthorized": true }' }, { name: 'Office 365', value: '{ "port": 587, "secure": false, "user": "ENTER_YOUR_EMAIL", "password": "ENTER_YOUR_PASSWORD", "tls": { "ciphers": "SSLv3" }}' }] });
+			opt.items.push({ id: 'random', name: '@(Random value)', icon: 'fa fa-calculator' });
 			opt.align = 'right';
 			opt.callback = function(item) {
 				var value = '';

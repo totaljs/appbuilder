@@ -6,7 +6,7 @@ $color        : #4285F4;
 }
 
 .monospace { font-family: $monospace; }
-html,body { overflow: hidden; }
+html,body { overflow: hidden !important; }
 
 header { height: 45px; border-bottom: 1px solid #E0E0E0; background-color: #FFF; }
 header > div { float: left; margin: 0 0 0 10px; padding-right: 10px; border-right: 1px solid #E0E0E0; height: 44px; }
@@ -168,9 +168,9 @@ header button.special, header a.special { color: #99982F; }
 .searchform figure { padding: 10px 0; border-top: 1px solid #E0E0E0; }
 .searchform figure:first-child { border-top: 0; }
 .searchform figure .name { font-weight: bold; font-size: 14px; padding: 0 15px 5px; }
-.searchform figure .name i { width: 14px; margin: 3px 10px 0 0; float: left; }
+.searchform figure .name i { width: 19px; margin: 3px 10px 0 0; float: left; }
 .searchform figure .line { line-height: 24px; height: 24px; border-bottom: 1px solid #F0F0F0; font-family: $monospace; font-size: 12px; cursor: pointer; padding: 0 15px; }
 .searchform figure .line:hover { background-color: #F8F8F8; }
 .searchform figure .line span { width: 20px; float: left; color: #999; }
-.searchform figure .line div { margin-left: 30px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.searchform figure .line div { margin-left: 30px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding: 0 1px; }
 .searchform figure .line:last-child { border-bottom: 0; }

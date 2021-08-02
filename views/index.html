@@ -38,20 +38,20 @@
 			<button class="exec apply" data-exec="designer/submit"><i class="fa fa-play"></i><span>@(APPLY)</span></button>
 		</div>
 		<div class="animation">
-			<button title="@(Add)" class="exec" data-exec="designer/add"><i class="far fa-plus-circle green"></i></button>
-			<button title="@(Settings)" class="exec" data-exec="designer/settings"><b class="green hidden" data-bind="designer.data__show:value?value.minify||value.design||value.cors||value.name||value.url||value.author:false"><i class="fa fa-circle"></i></b><i class="far fa-cog"></i></button>
-			<button title="@(Variables)" class="exec" data-exec="designer/variables"><b class="green hidden" data-bind="designer.data.variables__show:value && Object.keys(value).length > 0"><i class="fa fa-circle"></i></b><i class="far fa-receipt"></i></button>
-			<button title="@(Explorer)" class="exec" data-exec="designer/explorer"><i class="far fa-clipboard-list"></i></button>
-			<button title="@(Search)" class="exec" data-exec="designer/search"><i class="far fa-file-search"></i></button>
+			<button title="@(Add)" class="exec" data-exec="designer/add"><i class="fa fa-plus-circle green"></i></button>
+			<button title="@(Settings)" class="exec" data-exec="designer/settings"><b class="green hidden" data-bind="designer.data__show:value?value.minify||value.design||value.cors||value.name||value.url||value.author:false"><i class="fa fa-circle"></i></b><i class="fa fa-cog"></i></button>
+			<button title="@(Variables)" class="exec" data-exec="designer/variables"><b class="green hidden" data-bind="designer.data.variables__show:value && Object.keys(value).length > 0"><i class="fa fa-circle"></i></b><i class="fa fa-clipboard-list"></i></button>
+			<button title="@(Explorer)" class="exec" data-exec="designer/explorer"><i class="fa fa-stream"></i></button>
+			<button title="@(Search)" class="exec" data-exec="designer/search"><i class="fa fa-search"></i></button>
 		</div>
 		<div class="animation">
-			<button title="@(Import / Export)" class="exec" data-exec="designer/importexport"><i class="far fa-share-alt"></i></button>
-			<button title="@(Download build with design)" class="exec" data-exec="designer/download"><i class="far fa-save"></i></button>
-			<button title="@(Clear design)" class="exec" data-exec="designer/clear"><i class="far fa-trash-alt"></i></button>
+			<button title="@(Import / Export)" class="exec" data-exec="designer/importexport"><i class="fa fa-share-alt"></i></button>
+			<button title="@(Download build with design)" class="exec" data-exec="designer/download"><i class="fa fa-save"></i></button>
+			<button title="@(Clear design)" class="exec" data-exec="designer/clear"><i class="fa fa-trash-alt"></i></button>
 		</div>
 		<!--<button title="@(Templates)" class="exec animation special" data-exec="designer/templates"><i class="far fa-books-medical"></i></button>-->
 		<div class="animation">
-			<a href="https://docs.totaljs.com/" title="@(Documentation: Total.js Platform)" target="_blank" class="animation special"><i class="far fa-book"></i></a>
+			<a href="https://docs.totaljs.com/" title="@(Documentation: Total.js Platform)" target="_blank" class="animation special"><i class="fa fa-book"></i></a>
 		</div>
 		<!--<a href="https://www.totaljs.com/support/" title="@(Support)" target="_blank" class="animation special"><i class="far fa-life-ring"></i></a>-->
 	</header>
@@ -62,11 +62,11 @@
 	<div data-scope="designer">
 
 		<div class="toolbar">
-			<button class="exec" name="in" data-bind="?.zoom__enabled:value<100" data-exec="?/zoom" disabled><i class="far fa-search-plus"></i></button>
-			<!--<button class="exec" name="reset" data-bind="?.zoom__enabled:value!=100" data-exec="?/zoom"><i class="far fa-dot-circle"></i></button>-->
-			<button class="exec" name="out" data-bind="?.zoom__enabled:value>20" data-exec="?/zoom"><i class="far fa-search-minus"></i></button>
-			<button class="exec" name="undo" data-bind="?.history__enabled" data-exec="?/undo"><i class="fas fa-undo-alt"></i></button>
-			<button class="exec" name="code" title="@(Show hidden source-code)" data-exec="?/lastform" data-bind="common.form2id__enabled:!!value" disabled><i class="far fa-file-code"></i></button>
+			<button class="exec" name="in" data-bind="?.zoom__enabled:value<100" data-exec="?/zoom" disabled><i class="fa fa-search-plus"></i></button>
+			<!--<button class="exec" name="reset" data-bind="?.zoom__enabled:value!=100" data-exec="?/zoom"><i class="fa fa-dot-circle"></i></button>-->
+			<button class="exec" name="out" data-bind="?.zoom__enabled:value>20" data-exec="?/zoom"><i class="fa fa-search-minus"></i></button>
+			<button class="exec" name="undo" data-bind="?.history__enabled" data-exec="?/undo"><i class="fa fa-undo-alt"></i></button>
+			<button class="exec" name="code" title="@(Show hidden source-code)" data-exec="?/lastform" data-bind="common.form2id__enabled:!!value" disabled><i class="fa fa-file-code"></i></button>
 		</div>
 
 		<div data---="designer__?.data.body__margin:45;contextmenu:designer/designercontextmenu;change:designer/changeposition;$assign:DESIGNER;zoom:designer.zoom;history:?.history" class="invisible">
@@ -75,7 +75,7 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable npb">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit nmb" title="@(Double click for editing)">{{ note | empty }}</div>
 				</div>
@@ -86,24 +86,24 @@
 				</div>
 				<hr class="nmt nmb" />
 				<div class="add">
-					<div class="exec" data-exec="?/field_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
-					<div class="exec mr10" data-exec="?/field_import" title="@(Import CREATE SQL)"><span><i class="far fa-file-import mr5"></i>@(Import)</span></div>
-					<div class="exec mr10" data-exec="?/field_sql" title="@(Create SQL Table)"><span><i class="far fa-database mr5"></i>@(Create SQL)</span></div>
+					<div class="exec" data-exec="?/field_create"><span><i class="fa fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<div class="exec mr10" data-exec="?/field_import" title="@(Import CREATE SQL)"><span><i class="fa fa-file-import mr5"></i>@(Import)</span></div>
+					<div class="exec mr10" data-exec="?/field_sql" title="@(Create SQL Table)"><span><i class="fa fa-database mr5"></i>@(Create SQL)</span></div>
 					<label>@(Fields)</label>
 				</div>
 				<div class="fields" data-bind="?.data.body.{{ id }}.fields__template:{#template_fields}" data---="movable__null__selector:.field;exec:?/field_move"></div>
 				<div class="add">
-					<div class="exec" data-exec="?/operation_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<div class="exec" data-exec="?/operation_create"><span><i class="fa fa-plus-circle green mr5"></i>@(Add)</span></div>
 					<label>@(Operations)</label>
 				</div>
 				<div class="operations" data-bind="?.data.body.{{ id }}.operations__template:{#template_operations}" data---="movable__null__selector:.operation;exec:?/operation_move"></div>
 				<div class="add">
-					<div class="exec" data-exec="?/schematask_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<div class="exec" data-exec="?/schematask_create"><span><i class="fa fa-plus-circle green mr5"></i>@(Add)</span></div>
 					<label>@(Tasks)</label>
 				</div>
 				<div class="operations tasks" data-bind="?.data.body.{{ id }}.tasks__template:{#template_tasks}" data---="movable__null__selector:.operation;exec:?/operation_move"></div>
 				<div class="add">
-					<div class="exec" data-exec="?/route_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<div class="exec" data-exec="?/route_create"><span><i class="fa fa-plus-circle green mr5"></i>@(Add)</span></div>
 					<label>@(Routes)</label>
 				</div>
 				<div class="routes" data-bind="?.data.body.{{ id }}.routes__template:{#template_routes}" data---="movable__null__selector:.route;exec:?/route_move"></div>
@@ -113,13 +113,13 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable npb">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit nmb" title="@(Double click for editing)">{{ note | empty }}</div>
 				</div>
 				<hr style="margin:10px 0 0" />
 				<div class="add">
-					<div class="exec" data-exec="?/taskoperation_create"><span><i class="far fa-plus-circle green mr5"></i>@(Add)</span></div>
+					<div class="exec" data-exec="?/taskoperation_create"><span><i class="fa fa-plus-circle green mr5"></i>@(Add)</span></div>
 					<label>@(Operations)</label>
 				</div>
 				<div class="operations" style="margin-bottom:15px" data-bind="?.data.body.{{ id }}.operations__template:{#template_taskoperations}" data---="movable__null__selector:.operation;exec:?/operation_move"></div>
@@ -129,10 +129,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="url url2 edit" title="@(Double click for editing)">{{ authorized | authorized }}<span class="method" data-bind="?.data.body.{{ id }}.method__exec:?/routemethodstyle">{{ method }}</span><span data-bind="?.data.body.{{ id }}.url__text">{{ url }}</span></div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/route_sourcecode"><i class="far fa-laptop-code"></i>@(Edit action)</div>
+					<div class="code exec" data-exec="?/route_sourcecode"><i class="fa fa-laptop-code"></i>@(Edit action)</div>
 					<div class="keys" data-bind="?.data.body.{{ id }}__html:?/routeinfo"></div>
 				</div>
 			</script>
@@ -141,10 +141,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/definition_sourcecode"><i class="far fa-laptop-code"></i>@(Script)</div>
+					<div class="code exec" data-exec="?/definition_sourcecode"><i class="fa fa-laptop-code"></i>@(Script)</div>
 					<div class="keys" data-bind="?.data.body.{{ id }}.body__html:?/keywords"></div>
 				</div>
 			</script>
@@ -153,10 +153,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/init_sourcecode"><i class="far fa-laptop-code"></i>@(Script)</div>
+					<div class="code exec" data-exec="?/init_sourcecode"><i class="fa fa-laptop-code"></i>@(Script)</div>
 				</div>
 			</script>
 
@@ -164,10 +164,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/resource_update"><i class="far fa-pencil"></i>@(Edit dictionary)</div>
+					<div class="code exec" data-exec="?/resource_update"><i class="fa fa-pencil"></i>@(Edit dictionary)</div>
 					<div class="keys" data-bind="?.data.body.{{ id }}.languages__html:?/languages"></div>
 				</div>
 			</script>
@@ -176,10 +176,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/config_update"><i class="far fa-pencil"></i>@(Edit configuration)</div>
+					<div class="code exec" data-exec="?/config_update"><i class="fa fa-pencil"></i>@(Edit configuration)</div>
 					<div class="keys" data-bind="?.data.body.{{ id }}.body__html:?/keys"></div>
 				</div>
 			</script>
@@ -188,10 +188,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/modules_update"><i class="far fa-pencil"></i>@(Edit modules)</div>
+					<div class="code exec" data-exec="?/modules_update"><i class="fa fa-pencil"></i>@(Edit modules)</div>
 					<div class="keys" data-bind="?.data.body.{{ id }}__html:?/keys_modules"></div>
 				</div>
 			</script>
@@ -200,13 +200,13 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
 					<div class="minutes">
 						<b class="edit" data-type="minutes">{{ minutes }}</b> <span>min.</span>
 					</div>
-					<div class="code exec" data-exec="?/timer_sourcecode"><i class="far fa-pencil"></i>@(Script)</div>
+					<div class="code exec" data-exec="?/timer_sourcecode"><i class="fa fa-pencil"></i>@(Script)</div>
 				</div>
 			</script>
 
@@ -214,10 +214,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/ready_sourcecode"><i class="far fa-pencil"></i>@(Script)</div>
+					<div class="code exec" data-exec="?/ready_sourcecode"><i class="fa fa-pencil"></i>@(Script)</div>
 				</div>
 			</script>
 
@@ -225,10 +225,10 @@
 				<div class="icon" style="border-color:{{ color | emptycolor }}"><i class="{{ icon | emptyicon }} edit"></i></div>
 				<div class="color edit" style="background:{{ color | emptycolor }}"></div>
 				<div class="meta movable">
-					<span class="remove exec" data-exec="?/remove"><i class="far fa-trash-o"></i></span>
+					<span class="remove exec" data-exec="?/remove"><i class="fa fa-trash-o"></i></span>
 					<div class="name edit" title="@(Double click for editing)">{{ name }}</div>
 					<div class="description edit" title="@(Double click for editing)">{{ note | empty }}</div>
-					<div class="code exec" data-exec="?/middleware_sourcecode"><i class="far fa-pencil"></i>@(Script)</div>
+					<div class="code exec" data-exec="?/middleware_sourcecode"><i class="fa fa-pencil"></i>@(Script)</div>
 				</div>
 				<div class="padding">
 					<div class="checkbox"><div data---="checkbox__?.data.body.{{ id }}.staticfiles" class="mt10">@(Enable for static files)</div></div>
@@ -253,7 +253,7 @@
 	<script type="text/html" id="template_fields">
 		{{ foreach m in value }}
 		<div class="field subitem" data-index="{{ $index }}" draggable="true" data-type="fields">
-			<span class="remove exec" data-exec="?/field_remove"><i class="far fa-trash-o"></i></span>
+			<span class="remove exec" data-exec="?/field_remove"><i class="fa fa-trash-o"></i></span>
 			<div class="type"><span style="background:{{ m.type | type | color }}" class="edit colorize" data-edit="?/edit" data-type="type">{{ m.type }}</span></div>
 			<div class="required exec{{ if m.required }} is{{ fi }}" data-exec="?/field_required">@(required)</div>
 			<div class="name edit" data-edit="?/edit">{{ m.name }}</div>
@@ -264,9 +264,9 @@
 	<script type="text/html" id="template_operations">
 		{{ foreach m in value }}
 		<div class="operation subitem" data-index="{{ $index }}" draggable="true" data-type="operations">
-			<span class="remove exec" data-exec="?/operation_remove" title="@(Remove)"><i class="far fa-trash-o"></i></span>
-			<div class="code exec" data-exec="?/operation_sourcecode" title="@(Edit script)"><i class="far fa-laptop-code"></i>@(Script)</div>
-			<div class="roles"><i class="far fa-key"></i><span class="edit" data-type="roles">{{ m.roles | roles }}</span></div>
+			<span class="remove exec" data-exec="?/operation_remove" title="@(Remove)"><i class="fa fa-trash-o"></i></span>
+			<div class="code exec" data-exec="?/operation_sourcecode" title="@(Edit script)"><i class="fa fa-laptop-code"></i>@(Script)</div>
+			<div class="roles"><i class="fa fa-key"></i><span class="edit" data-type="roles">{{ m.roles | roles }}</span></div>
 			<div class="name edit">{{ m.name }}</div>
 		</div>
 		{{ end }}
@@ -275,10 +275,10 @@
 	<script type="text/html" id="template_tasks">
 		{{ foreach m in value }}
 		<div class="operation subitem" data-index="{{ $index }}" draggable="true" data-type="tasks">
-			<span class="remove exec" data-exec="?/taskoperation_remove" title="@(Remove)"><i class="far fa-trash-o"></i></span>
+			<span class="remove exec" data-exec="?/taskoperation_remove" title="@(Remove)"><i class="fa fa-trash-o"></i></span>
 			<div class="task_step edit"><span>{{ m.step | empty }}</span></div>
-			<div class="delimiter"><i class="fal fa-long-arrow-alt-right"></i></div>
-			<div class="task_name edit"><i class="far fa-traffic-light-slow"></i><span>{{ m.task | empty }}</span></div>
+			<div class="delimiter"><i class="fa fa-long-arrow-alt-right"></i></div>
+			<div class="task_name edit"><i class="far fa-traffic-light"></i><span>{{ m.task | empty }}</span></div>
 			<div class="name edit">{{ m.name }}</div>
 		</div>
 		{{ end }}
@@ -287,9 +287,9 @@
 	<script type="text/html" id="template_taskoperations">
 		{{ foreach m in value }}
 		<div class="operation subitem" data-index="{{ $index }}" draggable="true" data-type="operations">
-			<span class="remove exec" data-exec="?/operation_remove" title="@(Remove)"><i class="far fa-trash-o"></i></span>
-			<div class="code exec" data-exec="?/taskoperation_sourcecode" title="@(Edit script)"><i class="far fa-laptop-code"></i>@(Script)</div>
-			<!--<div class="roles"><i class="far fa-key"></i><span class="edit" data-type="roles">{{ m.roles | roles }}</span></div>-->
+			<span class="remove exec" data-exec="?/operation_remove" title="@(Remove)"><i class="fa fa-trash-o"></i></span>
+			<div class="code exec" data-exec="?/taskoperation_sourcecode" title="@(Edit script)"><i class="fa fa-laptop-code"></i>@(Script)</div>
+			<!--<div class="roles"><i class="fa fa-key"></i><span class="edit" data-type="roles">{{ m.roles | roles }}</span></div>-->
 			<div class="name edit">{{ m.name }}</div>
 		</div>
 		{{ end }}
@@ -299,7 +299,7 @@
 	<script type="text/html" id="template_routes">
 		{{ foreach m in value }}
 		<div class="route subitem" data-index="{{ $index }}" data-type="routes" draggable="true"{{ if m.note }} title="{{ m.note }}"{{ fi }}>
-			<span class="remove exec" data-exec="?/route_remove"><i class="far fa-trash-o"></i></span>
+			<span class="remove exec" data-exec="?/route_remove"><i class="fa fa-trash-o"></i></span>
 			<div class="actions">
 				{{ foreach n in m.actions }}
 				<span class="exec{{ if n === m.response }} selected{{ fi }}" data-exec="?/route_response" data-index="{{ $index }}">{{ n }}</span>
@@ -332,40 +332,40 @@
 		</div>
 	</script>
 
-	<div data---="form__common.form2__if:customcodeform;style:1;title:@(Custom script);icon:far fa-code;submit:designer/submit_code;zindex:50;autofocus:1;width:1400" class="hidden invisible">
+	<div data---="form__common.form2__if:customcodeform;style:1;title:@(Custom script);icon:fa fa-code;submit:designer/submit_code;zindex:50;autofocus:1;width:1400" class="hidden invisible">
 		<div class="padding">
 			<div>
 				<ul class="togglebuttons">
 					<li class="exec" data-exec="designer/template">
-						<i class="far fa-laptop-code"></i>@(Insert template)
+						<i class="fa fa-laptop-code"></i>@(Insert template)
 					</li>
 					<li class="exec" data-exec="designer/autocomplete">
-						<i class="far fa-book"></i>@(Autocomplete)
+						<i class="fa fa-book"></i>@(Autocomplete)
 					</li>
 				</ul>
 			</div>
 			<div class="bg-smoke codehelp">
 				<div data---="viewbox__common.form2__parent:parent">
-					<div class="code"><label><i class="far fa-lightbulb-on"></i>@(Basic variables):</label><pre class="monospace" id="codehelp"></pre></div>
+					<div class="code"><label><i class="fa fa-lightbulb-on"></i>@(Basic variables):</label><pre class="monospace" id="codehelp"></pre></div>
 				</div>
 			</div>
 			<div data---="codemirror__customcodeform.code__type:totaljs_server;parent:auto;margin:410;contextmenu:designer/contextmenu;$assign:EDITOR;height:0__''" class="mt10"></div>
-			<div class="help"><a href="https://docs.totaljs.com/total4/" target="_blank"><i class="far fa-book-spells"></i>@(Documentation)</a></div>
+			<div class="help"><a href="https://docs.totaljs.com/total4/" target="_blank"><i class="fa fa-book"></i>@(Documentation)</a></div>
 		</div>
 		<nav data---="validation__customcodeform">
-			<button name="submit" disabled><i class="far fa-check-circle"></i>@(APPLY)</button>
+			<button name="submit" disabled><i class="fa fa-check-circle"></i>@(APPLY)</button>
 			<button name="cancel">@(Hide)</button>
 		</nav>
 	</div>
 
-	<div data---="form__common.form__if:importfields;width:700;title:@(Import CREATE SQL);icon:far fa-file-import;submit:designer/submit_import;zindex:50;autofocus:1" class="hidden invisible">
+	<div data---="form__common.form__if:importfields;width:700;title:@(Import CREATE SQL);icon:fa fa-file-import;submit:designer/submit_import;zindex:50;autofocus:1" class="hidden invisible">
 		<script type="text/html">
 		<div class="padding">
 			<div data---="codemirror__importfields.code__height:300;type:plain__''" class="m"></div>
 			<div data---="checkbox__importfields.replace__null__true">@(Replace existing fields)</div>
 		</div>
 		<nav data---="validation__importfields">
-			<button name="submit" disabled><i class="far fa-file-import"></i>@(IMPORT)</button>
+			<button name="submit" disabled><i class="fa fa-file-import"></i>@(IMPORT)</button>
 			<button name="cancel">@(Cancel)</button>
 		</nav>
 		</script>
@@ -736,28 +736,28 @@
 				var opt = {};
 				opt.element = el;
 				opt.items = [];
-				opt.items.push({ id: 'schema', name: '@(Schema)', icon: 'far fa-clipboard-list-check' });
-				opt.items.push({ id: 'route', name: '@(Route)', icon: 'far fa-crosshairs' });
-				opt.items.push({ id: 'definition', name: '@(Definition)', icon: 'far fa-cogs' });
-				opt.items.push({ id: 'config', name: '@(Configuration)', icon: 'far fa-wrench' });
-				opt.items.push({ id: 'resource', name: '@(Resource)', icon: 'far fa-language' });
-				opt.items.push({ id: 'label', name: '@(Label)', icon: 'far fa-font-case' });
-				opt.items.push({ id: 'notes', name: '@(Notes)', icon: 'fal fa-file-alt' });
-				opt.items.push({ id: 'task', name: '@(Task)', icon: 'far fa-traffic-light-stop' });
-				opt.items.push({ id: 'middleware', name: '@(Middleware)', icon: 'far fa-random' });
+				opt.items.push({ id: 'schema', name: '@(Schema)', icon: 'fa fa-code-branch' });
+				opt.items.push({ id: 'route', name: '@(Route)', icon: 'fa fa-crosshairs' });
+				opt.items.push({ id: 'definition', name: '@(Definition)', icon: 'fa fa-cogs' });
+				opt.items.push({ id: 'config', name: '@(Configuration)', icon: 'fa fa-wrench' });
+				opt.items.push({ id: 'resource', name: '@(Resource)', icon: 'fa fa-language' });
+				opt.items.push({ id: 'label', name: '@(Label)', icon: 'fa fa-font' });
+				opt.items.push({ id: 'notes', name: '@(Notes)', icon: 'fa fa-file-alt' });
+				opt.items.push({ id: 'task', name: '@(Task)', icon: 'fa fa-traffic-light' });
+				opt.items.push({ id: 'middleware', name: '@(Middleware)', icon: 'fa fa-random' });
 				opt.items.push('-');
-				opt.items.push({ id: 'ready', name: '@(Ready)', icon: 'far fa-flag-checkered' });
-				opt.items.push({ id: 'timer', name: '@(Timer)', icon: 'far fa-alarm-clock' });
+				opt.items.push({ id: 'ready', name: '@(Ready)', icon: 'fa fa-flag-checkered' });
+				opt.items.push({ id: 'timer', name: '@(Timer)', icon: 'fa fa-clock' });
 				opt.items.push('-');
-				opt.items.push({ id: 'modules', name: '@(Modules)', icon: 'far fa-alien-monster' });
-				opt.items.push({ id: 'init', name: '@(Initialization script)', icon: 'far fa-flag-checkered' });
+				opt.items.push({ id: 'modules', name: '@(Modules)', icon: 'fa fa-plug' });
+				opt.items.push({ id: 'init', name: '@(Initialization script)', icon: 'fa fa-flag-checkered' });
 				opt.callback = function(item) {
 
 					switch (item.id) {
 						case 'schema':
 							var model = {};
 							model.id = 's' + Date.now().toString(36);
-							model.icon = 'far fa-code-branch';
+							model.icon = 'fa fa-code-branch';
 							model.name = 'Schema';
 							model.type = 'schema';
 							model.note = 'Description';
@@ -772,7 +772,7 @@
 						case 'task':
 							var model = {};
 							model.id = 'a' + Date.now().toString(36);
-							model.icon = 'far fa-traffic-light-stop';
+							model.icon = 'fa fa-traffic-light';
 							model.name = 'Task';
 							model.type = 'task';
 							model.note = 'Description';
@@ -784,7 +784,7 @@
 						case 'route':
 							var model = {};
 							model.id = 'r' + Date.now().toString(36);
-							model.icon = 'far fa-crosshairs';
+							model.icon = 'fa fa-crosshairs';
 							model.type = 'route';
 							model.note = 'Description';
 							model.method = 'GET';
@@ -799,7 +799,7 @@
 							break;
 						case 'definition':
 							var model = {};
-							model.icon = 'far fa-cogs';
+							model.icon = 'fa fa-cogs';
 							model.color = '#EF9D4B';
 							model.id = 'd' + Date.now().toString(36);
 							model.name = 'Definition';
@@ -826,7 +826,7 @@
 							break;
 						case 'ready':
 							var model = {};
-							model.icon = 'far fa-flag-checkered';
+							model.icon = 'fa fa-flag-checkered';
 							model.color = '#62962B';
 							model.id = 'x' + Date.now().toString(36);
 							model.name = 'Ready';
@@ -837,7 +837,7 @@
 							break;
 						case 'timer':
 							var model = {};
-							model.icon = 'far fa-alarm-clock';
+							model.icon = 'fa fa-clock';
 							model.color = '#7BFA8D';
 							model.id = 't' + Date.now().toString(36);
 							model.name = 'Timer';
@@ -849,7 +849,7 @@
 							break;
 						case 'init':
 							var model = {};
-							model.icon = 'far fa-flag-checkered';
+							model.icon = 'fa fa-flag-checkered';
 							model.id = 'i' + Date.now().toString(36);
 							model.color = '#E73323';
 							model.name = 'Init';
@@ -860,7 +860,7 @@
 							break;
 						case 'resource':
 							var model = {};
-							model.icon = 'far fa-language';
+							model.icon = 'fa fa-language';
 							model.id = 'l' + Date.now().toString(36);
 							model.color = '#E73CF7';
 							model.name = 'Resource';
@@ -872,7 +872,7 @@
 						case 'config':
 							var model = {};
 							model.color = '#62C9CA';
-							model.icon = 'far fa-wrench';
+							model.icon = 'fa fa-wrench';
 							model.id = 'c' + Date.now().toString(36);
 							model.name = 'Configuration';
 							model.type = 'config';
@@ -883,7 +883,7 @@
 						case 'modules':
 							var model = {};
 							model.color = '#451393';
-							model.icon = 'far fa-alien-monster';
+							model.icon = 'fa fa-plug';
 							model.id = 'm' + Date.now().toString(36);
 							model.name = 'Modules';
 							model.type = 'modules';
@@ -894,7 +894,7 @@
 						case 'middleware':
 							var model = {};
 							model.id = 'w' + Date.now().toString(36);
-							model.icon = 'far fa-random';
+							model.icon = 'fa fa-random';
 							model.name = 'Middleware';
 							model.type = 'middleware';
 							model.note = 'Description';
@@ -1172,19 +1172,19 @@
 				opt.items = [];
 
 				if (!op.query)
-					opt.items.push({ name: '@(Query)', id: 'query', icon: 'far fa-th-list' });
+					opt.items.push({ name: '@(Query)', id: 'query', icon: 'fa fa-th-list' });
 				if (!op.read)
-					opt.items.push({ name: '@(Read)', id: 'read', icon: 'far fa-address-card' });
+					opt.items.push({ name: '@(Read)', id: 'read', icon: 'fa fa-address-card' });
 				if (!op.insert)
-					opt.items.push({ name: '@(Insert)', id: 'insert', icon: 'far fa-database' });
+					opt.items.push({ name: '@(Insert)', id: 'insert', icon: 'fa fa-database' });
 				if (!op.update)
-					opt.items.push({ name: '@(Update)', id: 'update', icon: 'far fa-database' });
+					opt.items.push({ name: '@(Update)', id: 'update', icon: 'fa fa-database' });
 				if (!op.patch)
-					opt.items.push({ name: '@(Patch)', id: 'patch', icon: 'far fa-database' });
+					opt.items.push({ name: '@(Patch)', id: 'patch', icon: 'fa fa-database' });
 				if (!op.save)
-					opt.items.push({ name: '@(Save)', id: 'save', icon: 'far fa-database' });
+					opt.items.push({ name: '@(Save)', id: 'save', icon: 'fa fa-database' });
 				if (!op.remove)
-					opt.items.push({ name: '@(Remove)', id: 'remove', icon: 'far fa-trash-alt' });
+					opt.items.push({ name: '@(Remove)', id: 'remove', icon: 'fa fa-trash-alt' });
 
 				if (opt.items.length)
 					opt.items.push('-');
@@ -1253,7 +1253,7 @@
 				var id = (el.hclass('item') ? el : el.closest('.item')).attrd('id');
 				var index = +el.closest('.subitem').attrd('index');
 
-				SETTER('approve/show', '@(Are you sure you want to remove selected operation?)', '"far fa-trash-alt" @(Remove)', function() {
+				SETTER('approve/show', '@(Are you sure you want to remove selected operation?)', '"fa fa-trash-alt" @(Remove)', function() {
 					var name = designer.data.body[id].operations[index].name;
 					var item = designer.data.body[id];
 					var updateroutes = false;
@@ -1286,7 +1286,7 @@
 				var id = (el.hclass('item') ? el : el.closest('.item')).attrd('id');
 				var index = +el.closest('.subitem').attrd('index');
 
-				SETTER('approve/show', '@(Are you sure you want to remove selected operation?)', '"far fa-trash-alt" @(Remove)', function() {
+				SETTER('approve/show', '@(Are you sure you want to remove selected operation?)', '"fa fa-trash-alt" @(Remove)', function() {
 					var history = [];
 					var name = designer.data.body[id].tasks[index].name;
 					var item = designer.data.body[id];
@@ -1544,7 +1544,7 @@
 			exports.route_remove = function(el) {
 				var id = el.closest('.item').attrd('id');
 				var index = +el.closest('.route').attrd('index');
-				SETTER('approve/show', '@(Are you sure you want to remove selected route?)', '"far fa-trash-alt" @(Remove)', function() {
+				SETTER('approve/show', '@(Are you sure you want to remove selected route?)', '"fa fa-trash-alt" @(Remove)', function() {
 					var item = designer.data.body[id];
 					DESIGNER.history('route_remove', [CLONE(item)]);
 					item.routes.splice(index, 1);
@@ -1610,7 +1610,7 @@
 			exports.field_remove = function(el) {
 				var id = el.closest('.item').attrd('id');
 				var index = +el.closest('.field').attrd('index');
-				SETTER('approve/show', '@(Are you sure you want to remove selected field?)', '"far fa-trash-alt" @(Remove)', function() {
+				SETTER('approve/show', '@(Are you sure you want to remove selected field?)', '"fa fa-trash-alt" @(Remove)', function() {
 					var item = designer.data.body[id];
 					DESIGNER.history('field_remove', [CLONE(item)]);
 					item.fields.splice(index, 1);
@@ -1690,7 +1690,7 @@
 			exports.keys = function(val, path, el) {
 				var keys = Object.keys(FUNC.parseresource(val));
 				for (var i = 0; i < keys.length; i++)
-					keys[i] = '<div><i class="far fa-key"></i>{0}</div>'.format(Thelpers.encode(keys[i]));
+					keys[i] = '<div><i class="fa fa-key"></i>{0}</div>'.format(Thelpers.encode(keys[i]));
 				el.tclass('hidden', !keys.length);
 				return keys.join('');
 			};
@@ -1728,7 +1728,7 @@
 			exports.languages = function(val, path, el) {
 				var keys = val ? Object.keys(val) : [];
 				for (var i = 0; i < keys.length; i++)
-					keys[i] = '<div><i class="far fa-language"></i>{0}</div>'.format(Thelpers.encode(keys[i]));
+					keys[i] = '<div><i class="fa fa-language"></i>{0}</div>'.format(Thelpers.encode(keys[i]));
 				el.tclass('hidden', !keys.length);
 				return keys.join('');
 			};
@@ -1930,7 +1930,7 @@
 								if (item.type === 'task' && item.name === task.task) {
 									for (var i = 0; i < item.operations.length; i++) {
 										var m = item.operations[i];
-										opt.items.push({ id: m.name, name: m.name, icon: 'far fa-stopwatch' });
+										opt.items.push({ id: m.name, name: m.name, icon: 'fa fa-stopwatch' });
 									}
 									break;
 								}
@@ -1940,7 +1940,7 @@
 						for (var key in designer.data.body) {
 							var item = designer.data.body[key];
 							if (item.type === 'task')
-								opt.items.push({ id: item.name, name: item.name, icon: 'far fa-traffic-light-slow' });
+								opt.items.push({ id: item.name, name: item.name, icon: 'fa fa-traffic-light' });
 						}
 					}
 
@@ -2024,14 +2024,14 @@
 
 				switch (subtype) {
 					case 'type':
-						opt.icon = 'far fa-database';
+						opt.icon = 'fa fa-database';
 						opt.offsetWidth = 250;
 						opt.summary = '<b>@(Allowed types:)</b><div class="floatinginput-types"><span>string</span><span>number</span><span>date</span><span>boolean</span><span>email</span><span>phone</span><span>zip</span><span>uppercase</span><span>lowercase</span><span>name</span><span>url</span><span>capitalize</span><span>uid</span><span>json</span><span>base64</span></div>Some types can contain defined max. length e.g. <code>String(50)</code> and types can be defined as array in the form e.g. <code>[email]</code>.';
 						opt.placeholder = 'string(50)';
 						break;
 
 					case 'minutes':
-						opt.icon = 'far fa-alarm-clock';
+						opt.icon = 'fa fa-clock';
 						opt.summary = '@(Enter minutes when the framework will execute the script.)';
 						opt.placeholder = 'Minutes';
 						break;
@@ -2041,7 +2041,7 @@
 						if (opt.value.charAt(0) === '<')
 							opt.value = '';
 
-						opt.icon = 'far fa-key';
+						opt.icon = 'fa fa-key';
 						opt.offsetWidth = 270;
 						opt.summary = '@(Type <b>user roles</b> that will be permitted to this operation. A comma must separate roles.)';
 						opt.placeholder = 'admin, editor';
@@ -2399,7 +2399,7 @@
 		}, 2000);
 
 		Thelpers.emptyicon = function(val) {
-			return val || 'far fa-icons';
+			return val || 'far fa-circle';
 		};
 
 		Thelpers.emptycolor = function(val) {
@@ -2411,7 +2411,7 @@
 		};
 
 		Thelpers.authorized = function(val) {
-			return val === '+' ? '<i class="far fa-lock-alt mr5 red"></i>' : val === '-' ? '<i class="far fa-lock-open mr5"></i>' : '';
+			return val === '+' ? '<i class="fa fa-lock mr5 red"></i>' : val === '-' ? '<i class="fa fa-key mr5"></i>' : '';
 		};
 
 		Thelpers.routing = function(val) {
